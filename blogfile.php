@@ -1,5 +1,6 @@
 <?php
 /*******************************************************************************
+ *******************************************************************************
  **
  ** BlogFile - The blog in a single PHP file
  **
@@ -7,6 +8,11 @@
  **
  ** @version 1.0
  **
+ ** @copyright (C) 2012 Samuel Levy <sam@samuellevy.com>
+ **
+ ** @license http://sam.zoy.org/wtfpl/ DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ **
+ *******************************************************************************
  ******************************************************************************/
 
 // FIRST - define the thing that everyone will want to change... The Templates!
@@ -39,16 +45,20 @@ ob_start();
 <%%ENDTEMPLATE MAIN_JS%%>
 </script>
 <?php
-$_TEMPLATES = ob_get_clean();
+$_TEMPLATE = new TemplateEngine();
+
+$_TEMPLATE->parse_templates(ob_get_clean());
 
 /** Template engine **/
 define('TEMPLATE_OVERWRITE',1);
 define('TEMPLATE_IGNORE',2);
 class TemplateEngine {
     private $templates; // template library
+    private $templates_rendered; // temporary array for reducing work done, and gaining speed at the cost of memory
     
     function __construct() {
         $this->templates = array();
+        $this->templates_rendered = array();
     }
     
     /** Parses input string to find templates, then adds templates to the template library
@@ -204,7 +214,21 @@ class TemplateEngine {
      *              the template library.
      */
     function render($template_name, $slots) {
-        
+        if(isset($this->templates[$template_name])) {
+            // get a hash for this template name and slots value
+            $hash = md5($template_name."||".var_export($slots));
+            
+            // assume that anything matching the same hash would render the same
+            if (!isset($this->templates_rendered[$hash])) {
+                $temp = $this->templates[$template_name];
+                $this->templates_rendered[$hash] = $temp->render($slots, $this);
+            }
+            
+            // return the stored render
+            return $this->templates_rendered[$hash];
+        } else {
+            throw new TemplateMissingException("Template '$template_name' does not exists, or may not have been loaded.");
+        }
     }
     
     /** Returns a list of all template names in the template library
@@ -236,8 +260,10 @@ class Template {
     private $required_templates;
     
     function __construct($content, $name) {
-        $this->template = $content;
+        $this->content = $content;
         $this->name = $name;
+        $this->required_templates = array();
+        $this->slots_available = array();
         $this->parse();
     }
     
@@ -245,7 +271,29 @@ class Template {
      * templates.
      */
     private function parse() {
+        // first search for required templates
+        $matches = array();
+        preg_match_all('/<%%USETEMPLATE ([-0-9A-Za-z_\.]+)%%>/', $this->content, $matches);
         
+        // for every match, check if we have it already, and if not add it to our list of required templates
+        foreach ($matches as $m) {
+            if (!in_array($m[1], $this->required_templates)) {
+                $this->required_templates[] = $m[1];
+            }
+        }
+        
+        // now search for available slots
+        $matches = array();
+        preg_match_all('/<%%OPENSLOT ([-0-9A-Za-z_\.]+)%%>/', $this->content, $matches);
+        
+        // for every match, check if we have it already, and if not add it to our list of available slots
+        foreach ($matches as $m) {
+            if (!in_array($m[1], $this->slots_available)) {
+                $this->slots_available[] = $m[1];
+            }
+        }
+        
+        // and we're done! That was easy!
     }
     
     /** Returns the template name
@@ -254,11 +302,53 @@ class Template {
     function get_name() {
         return $this->name;
     }
+    
+    /** Renders the template
+     * @param array $slots Optional data to fill slots in the template
+     * @param TemplateEngine &$template_source A source for other required templates
+     * @return string The template text
+     * @throws TemplateMissingException A required template could not be found in
+     *              the template source.
+     * @throws TemplateSourceRequiredException A template source is required to
+     *              render this template, but it has not been supplied.
+     */
+    function render($slots, TemplateEngine &$template_source) {
+        // check if we require templates, and have a source
+        if (count($this->required_templates) && !isset($template_source)) {
+            $c = count($this->required_templates);
+            $n = $this->name;
+            throw new TemplateSourceRequiredException("Cannot render template '$n' as $c template".($c==1?' is':'s are')." required, and no template source has been supplied.");
+        }
+        
+        // get a clean body to work off
+        $body = $this->content;
+        
+        // now try to render sub-templates
+        foreach ($this->required_templates as $r) {
+            try {
+                // get the sub-template
+                $temp = $template_source->render($r, $slots);
+                $body = str_replace("<%%USETEMPLATE $r%%>", $temp, $body);
+            } catch (TemplateMissingException $e) {
+                // throw a new message
+                $n = $this->name;
+                throw new TemplateMissingException("Cannot render template '$n', as template source cannot find template '$r'.");
+            }
+        }
+        
+        // now try to fill any slots available
+        foreach ($this->slots_available as $s) {
+            $body = str_replace("<%%OPENSLOT $s%%>", (isset($slots[$s])?$slots[$s]:''), $body);
+        }
+        
+        return $body;
+    }
 }
 
-// Template system exceptions - They add no functionality but having an exception
-//     type can help keep things clear
+// Template system exceptions - They add no extra functionality to exceptions but
+//     having a clear exception type can help you to figure out where things failed
 class TemplateException extends Exception {}
 class TemplateParseException extends TemplateException {}
 class TemplateDuplicateException extends TemplateException {}
 class TemplateMissingException extends TemplateException {}
+class TemplateSourceRequiredException extends TemplateException {}
