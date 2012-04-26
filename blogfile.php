@@ -211,6 +211,7 @@ table {
 <form method="POST">
   <div id="database">
     <p>First thing's first - you need to set some database settings</p>
+    <div class="error <%%OPENSLOT DB_ERROR_CLASS%%>"><%%OPENSLOT DB_ERROR%%></div>
     <div class="formfield">
       Hostname<br />
       <input type="text" name="DB_HOST" value="<%%OPENSLOT DB_HOST%%>" />
@@ -256,11 +257,11 @@ table {
       <span class="explain">The smaller text under the site title</span>
     </div>
   </div>
-  <input type="submit" value="Install" />
+  <input type="submit" name="DO_INSTALL" value="Install" />
 </form>
 <%%ENDTEMPLATE INSTALL_PAGE%%>
 
-<%%STARTTEMPLATE INSTALL_SQL%%>
+<%%STARTTEMPLATE INSTALL_SQL_COMMENTS%%>
 CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `post_id` int(11) NOT NULL,
@@ -272,7 +273,9 @@ CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>comments` (
   `author_hash` varchar(32) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+<%%ENDTEMPLATE INSTALL_SQL_COMMENTS%%>
 
+<%%STARTTEMPLATE INSTALL_SQL_POSTS%%>
 CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>posts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -282,7 +285,9 @@ CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>posts` (
   `comments_locked` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+<%%ENDTEMPLATE INSTALL_SQL_POSTS%%>
 
+<%%STARTTEMPLATE INSTALL_SQL_SETTINGS%%>
 CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>settings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `setting` varchar(50) NOT NULL,
@@ -290,7 +295,7 @@ CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>settings` (
   `time_set` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-<%%ENDTEMPLATE INSTALL_SQL%%>
+<%%ENDTEMPLATE INSTALL_SQL_SETTINGS%%>
 
 <%%STARTTEMPLATE CONFIG_FILE%%>
 // Database settings
@@ -307,7 +312,7 @@ if ($_MYSQLI->connect_errno) {
 }
 
 // Random hash used to salt all other hashes. Keep it secret!
-define('SITE_SALT','<%%OPENSLOT SITE_SALT%%>')
+define('SITE_SALT','<%%OPENSLOT SITE_SALT%%>');
 
 // and with this, the site will officially be isntalled!
 define('SITE_INSTALLED',true);
@@ -338,7 +343,7 @@ session_start();
 
 // The config file is a hidden file named after the current file; this allows
 //     multiple installations in a single folder
-include_once('.bg-config.'.__FILE__);
+include_once('.bg-config.'.basename(__FILE__));
 
 #<!-- INSTALLATION -->
 /*******************************************************************************
@@ -384,16 +389,39 @@ if (!defined('SITE_INSTALLED')) {
             
             // ensure that it's valid (and simple)
             if (preg_match('/^[A-Za-z0-9_]{0,15}$/',$DB_PREF)) {
-                // render the SQL 'install' query
-                $query = $_TEMPLATE->render("INSTALL_SQL", array('DB_PREFIX'=>$DB_PREF));
+                $error = false;
                 
+                // render the SQL 'install' querys
+                $query = $_TEMPLATE->render("INSTALL_SQL_COMMENTS", array('DB_PREFIX'=>$DB_PREF));
                 // run the query
                 $result = $_MYSQLI->query($query);
+                // record any errors
+                if (!$result) {
+                    $page_slots['DB_ERROR'] .= "Error creating database [".$_MYSQLI->errno."] :: ".$_MYSQLI->error."\n";
+                    $error = true;
+                }
+                
+                $query = $_TEMPLATE->render("INSTALL_SQL_POSTS", array('DB_PREFIX'=>$DB_PREF));
+                // run the query
+                $result = $_MYSQLI->query($query);
+                // record any errors
+                if (!$result) {
+                    $page_slots['DB_ERROR'] .= "Error creating database [".$_MYSQLI->errno."] :: ".$_MYSQLI->error."\n";
+                    $error = true;
+                }
+                
+                $query = $_TEMPLATE->render("INSTALL_SQL_SETTINGS", array('DB_PREFIX'=>$DB_PREF));
+                // run the query
+                $result = $_MYSQLI->query($query);
+                // record any errors
+                if (!$result) {
+                    $page_slots['DB_ERROR'] .= "Error creating database [".$_MYSQLI->errno."] :: ".$_MYSQLI->error."\n";
+                    $error = true;
+                }
                 
                 // if the query failed, show the user
-                if (!$result) {
+                if ($error) {
                     $page_slots['DB_ERROR_CLASS'] = "visible";
-                    $page_slots['DB_ERROR'] = "Error creating database [".$_MYSQLI->errno."] :: ".$_MYSQLI->error;
                     
                     $_SITE_CONTENT = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
                     $_DO_RENDER = true;
@@ -426,9 +454,9 @@ if (!defined('SITE_INSTALLED')) {
                     $config = "<?php\n".$_TEMPLATE->render("CONFIG_FILE", $config_parts);
                     
                     // check that the file was written
-                    if (file_put_contents('.bg-config.'.__FILE__, $config) !== false && file_exists('.bg-config.'.__FILE__)) {
+                    if (file_put_contents('.bg-config.'.basename(__FILE__), $config) !== false && file_exists('.bg-config.'.basename(__FILE__))) {
                         // attempt to remove all of the install stuff from this file
-                        $file = file_get_contents(__FILE__);
+                        $file = file_get_contents(basename(__FILE__));
                         
                         // replace the PHP sections
                         $file = preg_replace("/#<!-- INSTALLATION -->.*#<!-- END INSTALLATION -->/s",'',$file);
@@ -437,13 +465,13 @@ if (!defined('SITE_INSTALLED')) {
                         $file = preg_replace("/<!-- INSTALLATION -->.*<!-- END INSTALLATION -->/s",'',$file);
                         
                         // and try to re-write this file
-                        file_put_contents(__FILE__, $config);
+                        file_put_contents(basename(__FILE__), $file);
                         
                         // redirect to the login section
                         $_DO_REDIR = true;
                         $_REDIR_TARGET = '?p=login';
                     } else {
-                        $temp = array('CONFIG_FILENAME'=>'.bg-config.'.__FILE__,
+                        $temp = array('CONFIG_FILENAME'=>'.bg-config.'.basename(__FILE__),
                                       'CONFIG_FILE'=>$config);
                         
                         $_SITE_CONTENT = $_TEMPLATE->render("CONFIG_FILE_WRITE_ERROR",$temp);
