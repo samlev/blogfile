@@ -98,6 +98,12 @@ table {
 body {
     font-family: verdana, helvetica, arial, sans-serif;
 }
+p {
+    margin: 1.12em 0;
+}
+p:first-child {
+    margin-top: 0px;
+}
 
 /* Layout */
 #leftcolumn {
@@ -157,6 +163,16 @@ body {
     height: 100%;
     overflow-y: auto;
 }
+.contentwrapper {
+    margin: 10px 30px 10px 20px;
+    background: #FFFFFF;
+    padding: 10px;
+    border: 1px solid #F7F7F7;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+}
 
 /* Forms */
 .formfield {
@@ -174,8 +190,28 @@ body {
     font-size: small;
     font-style: italic;
     color: #AAAAAA;
-    margin-left: 18px;
+    margin-left: 5px;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 3ex;
+    height: 1.2em;
+    line-height: 1.2em;
 }
+.formfield .explain:before {
+    content: "(?) ";
+    font-style: normal;
+}
+.formfield .explain:hover {
+    width: auto;
+    max-width: 300px;
+    white-space: normal;
+    overflow: visible;
+    background: #FFFFFF;
+    padding-left: 3ex;
+    text-indent: -3ex;
+}
+
 .error {
     color:#660000;
     background-color: #FF9999;
@@ -187,25 +223,6 @@ body {
 }
 .error.visible {
     display:block;
-}
-
-/** installation specific styles **/
-#installform {
-    margin: 10px 30px 10px 20px;
-    background: #FFFFFF;
-    padding: 10px;
-    border: 1px solid #F7F7F7;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    -khtml-border-radius: 8px;
-    border-radius: 8px;
-}
-#installform p {
-    margin-bottom: 10px;
-    margin-top: 30px;
-}
-#installform div:first-child p {
-    margin-top: 0px;
 }
 <%%ENDTEMPLATE MAIN_CSS%%>
 </style>
@@ -233,7 +250,7 @@ body {
 
 <!-- blog templates -->
 <%%STARTTEMPLATE BLOG_SUMMARY%%>
-<div class="blogsummarywrapper">
+<div class="blogsummarywrapper contentwrapper">
   <div class="blogsummary">
     <div class="blogtitle">
       <a href="<%%OPENSLOT BLOG_URL%%>"><%%OPENSLOT BLOG_TITLE%%></a>
@@ -254,7 +271,7 @@ body {
 <%%ENDTEMPLATE BLOG_SUMMARY%%>
 
 <%%STARTTEMPLATE BLOG_FULL%%>
-<div class="blogwrapper">
+<div class="blogwrapper contentwrapper">
   <div class="blog">
     <div class="blogtitle"><%%OPENSLOT BLOG_TITLE%%></a></div>
     <div class="blogcontent">
@@ -319,56 +336,66 @@ body {
 </div>
 <%%ENDTEMPLATE ANTI_SPAM%%>
 
+<!-- Actual pages -->
+
+<%%STARTTEMPLATE LOGIN_PAGE%%>
+<form method="POST" class="contentwrapper">
+  <input type="hidden" name="p" value="login" />
+  <div class="error <%%OPENSLOT LOGIN_ERROR%%>">Password is incorrect. Try again.</div>
+  <div class="formfield">
+    Password<br />
+    <input type="password" name="password" />
+  </div>
+  <input type="submit" value="Log in" />
+</form>
+<%%ENDTEMPLATE LOGIN_PAGE%%>
+
 <!-- INSTALLATION -->
 <%%STARTTEMPLATE INSTALL_PAGE%%>
-<form method="POST" id="installform">
-  <div id="database">
-    <p>First thing's first - you need to set some database settings</p>
-    <div class="error <%%OPENSLOT DB_ERROR_CLASS%%>"><%%OPENSLOT DB_ERROR%%></div>
-    <div class="formfield">
-      Hostname<br />
-      <input type="text" name="DB_HOST" value="<%%OPENSLOT DB_HOST%%>" />
-    </div>
-    <div class="formfield">
-      Username<br />
-      <input type="text" name="DB_USER" value="<%%OPENSLOT DB_USER%%>" />
-    </div>
-    <div class="formfield">
-      Password<br />
-      <input type="text" name="DB_PASS" value="<%%OPENSLOT DB_PASS%%>" />
-    </div>
-    <div class="formfield">
-      Database<br />
-      <input type="text" name="DB_BASE" value="<%%OPENSLOT DB_BASE%%>" />
-    </div>
-    <div class="formfield">
-      Table Pre-fix<br />
-      <input type="text" name="DB_PREF" value="<%%OPENSLOT DB_PREF%%>" /><br />
-      <span class="explain">To install multiple blogs on one database, change this</span>
-    </div>
+<form method="POST" id="installform" class="contentwrapper">
+  <p>First thing's first - you need to set some database settings</p>
+  <div class="error <%%OPENSLOT DB_ERROR_CLASS%%>"><%%OPENSLOT DB_ERROR%%></div>
+  <div class="formfield">
+    Hostname<br />
+    <input type="text" name="DB_HOST" value="<%%OPENSLOT DB_HOST%%>" />
   </div>
-  <div id="settings">
-    <p>Well that was easy! Last couple of things you need to put in. These can be changed later.</p>
-    <div class="formfield">
-      Password<br />
-      <input type="text" name="password" value="<%%OPENSLOT password%%>" /><br />
-      <span class="explain">As this is a single-user blog, a password is all you need. Either write this password down, or change it to something you remember.</span>
-    </div>
-    <div class="formfield">
-      Your Name<br />
-      <input type="text" name="name" value="<%%OPENSLOT name%%>" /><br />
-      <span class="explain">This will be shown on your comments.</span>
-    </div>
-    <div class="formfield">
-      Site title<br />
-      <input type="text" name="sitetitle" value="<%%OPENSLOT sitetitle%%>" /><br />
-      <span class="explain">The large text at the top left.</span>
-    </div>
-    <div class="formfield">
-      Site extra<br />
-      <input type="text" name="siteextra" value="<%%OPENSLOT siteextra%%>" /><br />
-      <span class="explain">The smaller text under the site title</span>
-    </div>
+  <div class="formfield">
+    Username<br />
+    <input type="text" name="DB_USER" value="<%%OPENSLOT DB_USER%%>" />
+  </div>
+  <div class="formfield">
+    Password<br />
+    <input type="text" name="DB_PASS" value="<%%OPENSLOT DB_PASS%%>" />
+  </div>
+  <div class="formfield">
+    Database<br />
+    <input type="text" name="DB_BASE" value="<%%OPENSLOT DB_BASE%%>" />
+  </div>
+  <div class="formfield">
+    Table Pre-fix<br />
+    <input type="text" name="DB_PREF" value="<%%OPENSLOT DB_PREF%%>" />
+    <div class="explain">To install multiple blogs on one database, change this</div>
+  </div>
+  <p>Well that was easy! Now some site settings. These can be changed later.</p>
+  <div class="formfield">
+    Password<br />
+    <input type="text" name="password" value="<%%OPENSLOT password%%>" />
+    <div class="explain">This is a single-user blog, so a password is all you need. Either write this password down, or change it to something you remember.</div>
+  </div>
+  <div class="formfield">
+    Your Name<br />
+    <input type="text" name="name" value="<%%OPENSLOT name%%>" />
+    <div class="explain">This will be shown on your comments.</div>
+  </div>
+  <div class="formfield">
+    Site title<br />
+    <input type="text" name="sitetitle" value="<%%OPENSLOT sitetitle%%>" />
+    <div class="explain">The large text at the top left.</div>
+  </div>
+  <div class="formfield">
+    Site extra<br />
+    <input type="text" name="siteextra" value="<%%OPENSLOT siteextra%%>" />
+    <div class="explain">The smaller text under the site title</div>
   </div>
   <input type="submit" name="DO_INSTALL" value="Install" />
 </form>
@@ -432,10 +459,12 @@ define('SITE_INSTALLED',true);
 <%%ENDTEMPLATE CONFIG_FILE%%>
 
 <%%STARTTEMPLATE CONFIG_FILE_WRITE_ERROR%%>
-<p>Your site is almost installed!</p>
-<p>Not everything went to plan, however, and the configuration file could not be written.</p>
-<p>Copy this text below, and save it as a file called '<%%OPENSLOT CONFIG_FILENAME%%>' in the same folder as this file.</p>
-<textarea cols="110" rows="20"><%%OPENSLOT CONFIG_FILE%%></textarea>
+<div class="contentwrapper">
+  <p>Your site is almost installed!</p>
+  <p>Not everything went to plan, however, and the configuration file could not be written.</p>
+  <p>Copy this text below, and save it as a file called '<%%OPENSLOT CONFIG_FILENAME%%>' in the same folder as this file.</p>
+  <textarea cols="110" rows="20"><%%OPENSLOT CONFIG_FILE%%></textarea>
+</div>
 <%%ENDTEMPLATE CONFIG_FILE_WRITE_ERROR%%>
 <!-- END INSTALLATION -->
 <?php
@@ -540,6 +569,9 @@ if (!defined('SITE_INSTALLED')) {
                     $page_slots['MAIN_CONTENT'] = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
                     $_DO_RENDER = true;
                 } else {
+                    // set the database prefix in a way that classes can use it
+                    define('DB_PREF', $DB_PREF);
+                    
                     $config_parts = array();
                     $config_parts['DB_HOST'] = $DB_HOST;
                     $config_parts['DB_USER'] = $DB_USER;
@@ -555,14 +587,10 @@ if (!defined('SITE_INSTALLED')) {
                     $siteextra = trim($_POST['siteextra']);
                     
                     // Now add the settings
-                    $query = 'REPLACE INTO '.$DB_PREF.'settings (`setting`,`value`,`time_set`) VALUES ';
-                    $query .= "('password','$pword',NOW())";
-                    $query .= ", ('displayname','".mysqli_real_escape_string($_MYSQLI,$name)."',NOW())";
-                    $query .= ", ('sitetitle','".mysqli_real_escape_string($_MYSQLI,$sitetitle)."',NOW())";
-                    $query .= ", ('siteextra','".mysqli_real_escape_string($_MYSQLI,$siteextra)."',NOW())";
-                    
-                    // insert into the database
-                    $_MYSQLI->query($query);
+                    Settings::set('password',$pword);
+                    Settings::set('displayname',$name);
+                    Settings::set('sitetitle',$sitetitle);
+                    Settings::set('siteextra',$siteextra);
                     
                     // now we write the config file
                     $config = "<?php\n".$_TEMPLATE->render("CONFIG_FILE", $config_parts);
@@ -626,10 +654,12 @@ if (!defined('SITE_INSTALLED')) {
  *******************************************************************************/
 #<!-- END INSTALLATION -->
 
-$page = $_GET['p'];
+$page = $_REQUEST['p'];
 
 switch($page) {
     case "login":
+        $_PAGE_TITLE = "Log In";
+        
         if ($_SESSION['LOGGED_IN']) {
             // already logged in? just bounce to the home page
             $_DO_REDIR = true;
@@ -639,14 +669,7 @@ switch($page) {
             $pword = md5(sha1($_POST['password'].SITE_SALT).SITE_SALT);
             
             // check if the password is correct
-            $query = "SELECT `value`='$pword' as correct
-                      FROM ".DB_PREF."settings
-                      WHERE `setting`='password'
-                      AND `value`='$pword'";
-            
-            $result = run_query($query);
-            
-            if ($result->num_rows == 1) {
+            if ($pword == Settings::get('password')) {
                 // logged in!
                 $_SESSION['LOGGED_IN'] = true;
                 
@@ -680,19 +703,35 @@ switch($page) {
         break;
     case "home":
     default:
-        
+        // Show all posts
+        $_PAGE_TITLE = "Home";
+        $_SITE_CONTENT = "HOME";
+        $_DO_RENDER = true;
         break;
 }
 
-
 // Now to display!
 if ($_DO_RENDER) {
-    echo $_TEMPLATE->render('MAIN_HTML', array('PAGE_TITLE'=>$_PAGE_TITLE,
-                                               'SITE_TITLE'=>$_SITE_TITLE,
-                                               'SITE_EXTRA'=>$_SITE_EXTRA,
+    // get some standard variables
+    $site_title = htmlentities(Settings::get('sitetitle', 'BlogFile'));
+    $page_title = (isset($_PAGE_TITLE) && strlen(trim($_PAGE_TITLE))? $_PAGE_TITLE.' - '.$site_title : $site_title);
+    $site_home = basename(__FILE__);
+    $site_extra = htmlentities(Settings::get('siteextra', 'A BlogFile blog about things. And stuff.'));
+    
+    // and render the template
+    echo $_TEMPLATE->render('MAIN_HTML', array('PAGE_TITLE'=>$page_title,
+                                               'SITE_TITLE'=>$site_title,
+                                               'SITE_HOME'=>$site_home,
+                                               'SITE_EXTRA'=>$site_extra,
+                                               'MENU_ITEMS'=>get_menu(),
                                                'MAIN_CONTENT'=>$_SITE_CONTENT));
+    
+    // and that's all she wrote
+    die();
 } else if ($_DO_REDIR) {
+    // do a redirect
     header('Location: '.$_REDIR_TARGET);
+    // stop any further processing
     die();
 }
 
@@ -717,9 +756,122 @@ function run_query($query) {
     return $result;
 }
 
+function get_menu($page=null) {
+    global $_TEMPLATE;
+    
+    return $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__),
+                                                 'LINK_TEXT'=>"Home"));
+}
+
 /*******************************************************************************
  **************************** END HELPER FUNCTIONS *****************************
  *******************************************************************************/
+
+// simple static helper class for settings
+class Settings {
+    /** Sets a system setting, with some basic protection for some settings
+     * @param string $setting The setting name
+     * @param mixed $value The value to set
+     * @param bool $overwrite Overwrite any existing setting with the same name
+     */
+    static function set($setting,$value,$overwrite=false) {
+        global $_MYSQLI;
+        // check for some 'protected' types
+        switch ($setting) {
+            case 'displayname':
+            case 'password':
+                $overwrite = true;
+                break;
+        }
+        
+        // add the setting to the database
+        $query = "INSERT INTO `".DB_PREF."settings` (`setting`,`value`,`time_set`)
+                  VALUES  ('".mysqli_real_escape_string($_MYSQLI,$setting)."',
+                           '".mysqli_real_escape_string($_MYSQLI,serialize($value))."',
+                           NOW())";
+        run_query($query);
+        
+        // check if we're overwriting (actually, we're just removing any other variables by the same name)
+        if ($overwrite) {
+            // remove any other entries
+            $query = "DELETE FROM `".DB_PREF."settings`
+                      WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
+                      AND `id` != ".intval($_MYSQLI->insert_id);
+            
+            run_query($query);
+        }
+    }
+    
+    /** Gets a system setting
+     * @param string $setting The name of the variable to get
+     * @param mixed $default The default if the setting doesn't exist
+     * @return mixed The value of the setting, or default.
+     */
+    static function get($setting,$default=null) {
+        global $_MYSQLI;
+        
+        // get the setting
+        $query = "SELECT `value`
+                  FROM `".DB_PREF."settings`
+                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
+                  ORDER BY `id` DESC
+                  LIMIT 1";
+        
+        $result = run_query($query);
+        
+        // if we got a row, unserialize it, if not, use the default.
+        if ($row = mysqli_fetch_assoc($result)) {
+            $ret = unserialize($row['value']);
+        } else {
+            $ret = $default;
+        }
+        
+        // free the result
+        mysqli_free_result($result);
+        
+        // and return the value
+        return $ret;
+    }
+    
+    /** Simply checks if a setting exists
+     * @param string $setting The name of the setting
+     * @return bool True if the setting exists, False if not.
+     */
+    static function exists($setting) {
+        global $_MYSQLI;
+        
+        // get the setting
+        $query = "SELECT `id`
+                  FROM `".DB_PREF."settings`
+                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
+                  LIMIT 1";
+        
+        $result = run_query($query);
+        
+        if ($row = mysqli_fetch_assoc($result)) {
+            $ret = true;
+        } else {
+            $ret = false;
+        }
+        
+        // free the result
+        mysqli_free_result($result);
+        
+        // and return
+        return $ret;
+    }
+    
+    /** Deletes a setting if it exists
+     * @param string $setting The name of the setting
+     */
+    static function delete($setting) {
+        $query = "SELECT `id`
+                  FROM `".DB_PREF."settings`
+                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'";
+        
+        run_query($query);
+    }
+}
 
 /*******************************************************************************
  **************************** START TEMPLATE ENGINE ****************************
