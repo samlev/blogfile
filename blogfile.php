@@ -29,12 +29,14 @@ ob_start();
   <script type="text/javascript"><%%USETEMPLATE MAIN_JS%%></script>
 </head>
 <body>
-  <div id="leftcolumn>
+  <div id="leftcolumn">
     <div id="sitetitle"><a href="<%%OPENSLOT SITE_HOME%%>"><%%OPENSLOT SITE_TITLE%%></a></div>
     <div id="siteextra"><%%OPENSLOT SITE_EXTRA%%></div>
     <div id="sitemenu"><%%USETEMPLATE MAIN_MENU%%></div>
   </div>
-  <div id="rightcolumn"><%%OPENSLOT MAIN_CONTENT%%></div>
+  <div id="rightcolumn">
+    <div id="maincontent"><%%OPENSLOT MAIN_CONTENT%%></div>
+  </div>
 </body>
 </html>
 <%%ENDTEMPLATE MAIN_HTML%%>
@@ -92,8 +94,119 @@ table {
 	border-spacing: 0;
 }
 
+/* Now the blog's styles! */
+body {
+    font-family: verdana, helvetica, arial, sans-serif;
+}
 
+/* Layout */
+#leftcolumn {
+    width:300px;
+    position:absolute;
+    left: 0px;
+    top: 0px;
+    height:100%;
+    /* IE10 */ 
+    background-image: -ms-linear-gradient(left, #FFFFFF 95%, #EEEEEE 100%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(left, #FFFFFF 95%, #EEEEEE 100%);
+    /* Opera */ 
+    background-image: -o-linear-gradient(left, #FFFFFF 95%, #EEEEEE 100%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, right top, color-stop(0.95, #FFFFFF), color-stop(1, #EEEEEE));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(left, #FFFFFF 95%, #EEEEEE 100%);
+    /* Proposed W3C Markup */ 
+    background-image: linear-gradient(left, #FFFFFF 95%, #EEEEEE 100%);
+}
+#rightcolumn {
+    position:absolute;
+    left: 300px;
+    top: 0px;
+    right:0px;
+    height:100%;
+    background-color: #EEEEEE;
+}
 
+/* Left side */
+#sitetitle {
+    font-size: xx-large;
+    font-weight: bold;
+    margin:20px 10px 20px 10px;
+}
+#sitetitle a {
+    text-decoration: none;
+    text-shadow:2px 2px 2px #CCCCCC;
+    color: #333333;
+}
+#sitetitle a:hover {
+    color: #999999;
+}
+
+#siteextra {
+    margin:20px 10px 20px 30px;
+    color: #999999;
+    font-size: medium;
+    font-style: italic;
+    text-shadow:2px 2px 2px #EEEEEE;
+}
+
+/* Right side */
+#maincontent {
+    margin: 0px 0px 20px 10px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Forms */
+.formfield {
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 8px;
+    margin-left: 15px;
+}
+.formfield input {
+    margin-left: 18px;
+    width: 300px;
+}
+.formfield .explain {
+    font-weight: normal;
+    font-size: small;
+    font-style: italic;
+    color: #AAAAAA;
+    margin-left: 18px;
+}
+.error {
+    color:#660000;
+    background-color: #FF9999;
+    border: 2px #993333 solid;
+    font-weight: bold;
+    margin:3px;
+    padding: 8px;
+    display: none;
+}
+.error.visible {
+    display:block;
+}
+
+/** installation specific styles **/
+#installform {
+    margin: 10px 30px 10px 20px;
+    background: #FFFFFF;
+    padding: 10px;
+    border: 1px solid #F7F7F7;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+}
+#installform p {
+    margin-bottom: 10px;
+    margin-top: 30px;
+}
+#installform div:first-child p {
+    margin-top: 0px;
+}
 <%%ENDTEMPLATE MAIN_CSS%%>
 </style>
 
@@ -208,7 +321,7 @@ table {
 
 <!-- INSTALLATION -->
 <%%STARTTEMPLATE INSTALL_PAGE%%>
-<form method="POST">
+<form method="POST" id="installform">
   <div id="database">
     <p>First thing's first - you need to set some database settings</p>
     <div class="error <%%OPENSLOT DB_ERROR_CLASS%%>"><%%OPENSLOT DB_ERROR%%></div>
@@ -230,30 +343,30 @@ table {
     </div>
     <div class="formfield">
       Table Pre-fix<br />
-      <input type="text" name="DB_PREF" value="<%%OPENSLOT DB_PREF%%>" />
+      <input type="text" name="DB_PREF" value="<%%OPENSLOT DB_PREF%%>" /><br />
       <span class="explain">To install multiple blogs on one database, change this</span>
     </div>
   </div>
   <div id="settings">
-    <p>Well that was easy! Last couple of things you need to put in. These can be changed later</p>
+    <p>Well that was easy! Last couple of things you need to put in. These can be changed later.</p>
     <div class="formfield">
       Password<br />
-      <input type="text" name="password" value="<%%OPENSLOT password%%>" />
-      <span class="explain">As this is a single-user blog, a password is all you need.</span>
+      <input type="text" name="password" value="<%%OPENSLOT password%%>" /><br />
+      <span class="explain">As this is a single-user blog, a password is all you need. Either write this password down, or change it to something you remember.</span>
     </div>
     <div class="formfield">
-      Display Name<br />
-      <input type="text" name="name" value="<%%OPENSLOT name%%>" />
-      <span class="explain">This will be shown on posts and comments.</span>
+      Your Name<br />
+      <input type="text" name="name" value="<%%OPENSLOT name%%>" /><br />
+      <span class="explain">This will be shown on your comments.</span>
     </div>
     <div class="formfield">
       Site title<br />
-      <input type="text" name="sitetitle" value="<%%OPENSLOT sitetitle%%>" />
+      <input type="text" name="sitetitle" value="<%%OPENSLOT sitetitle%%>" /><br />
       <span class="explain">The large text at the top left.</span>
     </div>
     <div class="formfield">
       Site extra<br />
-      <input type="text" name="siteextra" value="<%%OPENSLOT siteextra%%>" />
+      <input type="text" name="siteextra" value="<%%OPENSLOT siteextra%%>" /><br />
       <span class="explain">The smaller text under the site title</span>
     </div>
   </div>
@@ -362,9 +475,10 @@ if (!defined('SITE_INSTALLED')) {
     if (isset($_POST['DO_INSTALL'])) {
         $INSTALL_ERROR = false;
         
-        // bring the post into page slots (just in case)
+        // bring the post into page slots (just in case there's an error)
         foreach($_POST as $k=>$v) {
-            $page_slots[$k]=$v;
+            // ensure that nothing is going to mess up the HTML
+            $page_slots[$k]=htmlentities($v);
         }
         
         // see if we can connect to mysql
@@ -381,7 +495,7 @@ if (!defined('SITE_INSTALLED')) {
             $page_slots['DB_ERROR'] = "Could not connect [".$_MYSQLI->connect_errno."] :: ".$_MYSQLI->connect_error;
             
             // render
-            $_SITE_CONTENT = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
+            $page_slots['MAIN_CONTENT'] = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
             $_DO_RENDER = true;
         } else {
             // get the database prefix
@@ -423,7 +537,7 @@ if (!defined('SITE_INSTALLED')) {
                 if ($error) {
                     $page_slots['DB_ERROR_CLASS'] = "visible";
                     
-                    $_SITE_CONTENT = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
+                    $page_slots['MAIN_CONTENT'] = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
                     $_DO_RENDER = true;
                 } else {
                     $config_parts = array();
@@ -474,7 +588,7 @@ if (!defined('SITE_INSTALLED')) {
                         $temp = array('CONFIG_FILENAME'=>'.bg-config.'.basename(__FILE__),
                                       'CONFIG_FILE'=>$config);
                         
-                        $_SITE_CONTENT = $_TEMPLATE->render("CONFIG_FILE_WRITE_ERROR",$temp);
+                        $page_slots['MAIN_CONTENT'] = $_TEMPLATE->render("CONFIG_FILE_WRITE_ERROR",$temp);
                         $_DO_RENDER = true;
                     }
                 }
@@ -488,15 +602,88 @@ if (!defined('SITE_INSTALLED')) {
         $page_slots['DB_BASE'] = 'blogfile';
         $page_slots['DB_PREF'] = 'bf_';
         
-        $_SITE_CONTENT = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
+        // generate a random password
+        $page_slots['password'] = substr(md5(time()), rand(0,10), rand(8,12));
+        $page_slots['name'] = "Joe Somebody";
+        $page_slots['sitetitle'] = "BlogFile";
+        $page_slots['siteextra'] = "A BlogFile blog about things. And stuff.";
+        
+        $page_slots['MAIN_CONTENT'] = $_TEMPLATE->render("INSTALL_PAGE", $page_slots);
         $_DO_RENDER = true;
     }
+    
+    // Now to display!
+    if ($_DO_RENDER) {
+        echo $_TEMPLATE->render('MAIN_HTML', $page_slots);
+    } else if ($_DO_REDIR) {
+        header('Location: '.$_REDIR_TARGET);
+    }
+    die();
 }
 
 /*******************************************************************************
  ****************************** END SITE INSTALLER *****************************
  *******************************************************************************/
 #<!-- END INSTALLATION -->
+
+$page = $_GET['p'];
+
+switch($page) {
+    case "login":
+        if ($_SESSION['LOGGED_IN']) {
+            // already logged in? just bounce to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = '?p=home';
+        } else if(isset($_POST['password'])) {
+            // attempt to log in
+            $pword = md5(sha1($_POST['password'].SITE_SALT).SITE_SALT);
+            
+            // check if the password is correct
+            $query = "SELECT `value`='$pword' as correct
+                      FROM ".DB_PREF."settings
+                      WHERE `setting`='password'
+                      AND `value`='$pword'";
+            
+            $result = run_query($query);
+            
+            if ($result->num_rows == 1) {
+                // logged in!
+                $_SESSION['LOGGED_IN'] = true;
+                
+                // bounce to the home page
+                $_DO_REDIR = true;
+                $_REDIR_TARGET = '?p=home';
+            } else {
+                // impose a short wait (as an attempt at slowing brute-force attacks)
+                if (isset($_SESSION['LOGGED_IN_WAIT'])) {
+                    // double the wait with each failure
+                    $_SESSION['LOGGED_IN_WAIT'] *= 2;
+                } else {
+                    // initial wait is 2 seconds
+                    $_SESSION['LOGGED_IN_WAIT'] = 2;
+                }
+                
+                sleep($_SESSION['LOGGED_IN_WAIT']);
+                
+                // re-render the login page
+                $_SITE_CONTENT = $_TEMPLATE->render("LOGIN_PAGE",array("LOGIN_ERROR"=>"visible"));
+                $_DO_RENDER = true;
+            }
+            
+            // free the result
+            mysqli_free_result($result);
+        } else {
+            // show the login page
+            $_SITE_CONTENT = $_TEMPLATE->render("LOGIN_PAGE");
+            $_DO_RENDER = true;
+        }
+        break;
+    case "home":
+    default:
+        
+        break;
+}
+
 
 // Now to display!
 if ($_DO_RENDER) {
