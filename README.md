@@ -84,10 +84,10 @@ What about making my posts and comments look pretty?
 A simple MarkDown is as follows:
 * `_words that will be italic_`
 * `*words that will be bold*`
+* `#words that will be monospaced#`
 * Urls will be auto-linked.
-* `[[http://some.url] description of url]`
+* Urls can be named like this: `[http://some.url description of url]`
 * You can disable URLs being linked in comments.
-* `##words that will be monospaced##`
 
 But I want images! I want to make random words 50 feet high, and hot pink!
 --------------------------------------------------------------------------

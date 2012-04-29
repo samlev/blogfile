@@ -26,6 +26,7 @@ ob_start();
 <head>
   <title><%%OPENSLOT PAGE_TITLE%%></title>
   <style type="text/css"><%%USETEMPLATE MAIN_CSS%%></style>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
   <script type="text/javascript"><%%USETEMPLATE MAIN_JS%%></script>
 </head>
 <body>
@@ -349,6 +350,33 @@ p:first-child {
   <input type="submit" value="Log in" />
 </form>
 <%%ENDTEMPLATE LOGIN_PAGE%%>
+
+<%%STARTTEMPLATE NO_POSTS%%>
+<div class="contentwrapper">
+  <h2>These are not the posts you're looking for...</h2>
+  <p>Because there's nothing here.</p>
+</div>
+<%%ENDTEMPLATE NO_POSTS%%>
+
+<%%STARTTEMPLATE NEWER_LINK%%>
+<a href="?p=<%%OPENSLOT PAGE_TYPE%%>&amp;s=<%%OPENSLOT NEWER_NUMBER%%>">&lt; Newer</a>
+<%%ENDTEMPLATE NEWER_LINK%%>
+
+<%%STARTTEMPLATE OLDER_LINK%%>
+<a href="?p=<%%OPENSLOT PAGE_TYPE%%>&amp;s=<%%OPENSLOT OLDER_NUMBER%%>">Older &gt;</a>
+<%%ENDTEMPLATE OLDER_LINK%%>
+
+<%%STARTTEMPLATE PAGE_LINKS%%>
+<div id="pglinks">
+  <div id="pgright">
+    <%%OPENSLOT LINK_RIGHT%%>
+  </div>
+  <div id="pgleft">
+    <%%OPENSLOT LINK_LEFT%%>
+  </div>
+</div>
+<div class="visclear">&nbsp;</div>
+<%%ENDTEMPLATE PAGE_LINKS%%>
 
 <!-- INSTALLATION -->
 <%%STARTTEMPLATE INSTALL_PAGE%%>
@@ -703,9 +731,107 @@ switch($page) {
         break;
     case "home":
     default:
-        // Show all posts
-        $_PAGE_TITLE = "Home";
-        $_SITE_CONTENT = "HOME";
+        // get the limit of posts per page
+        $limit = intval(Settings::get('homepage_posts',Settings::get('posts_per_page',10)));
+        
+        // get the page number (if we're delving into history)
+        $start = (intval($_REQUEST['s'])>0?intval($_REQUEST['s']):0);
+        
+        // find out how many posts are available
+        $query = "SELECT count(`id`) as count
+                  FROM `".DB_PREF."posts`
+                  WHERE `publish_date` IS NOT NULL
+                  AND `type`='post'";
+        
+        $result = run_query($query);
+        $row = mysqli_fetch_assoc($result);
+        mysqli_free_result($result);
+        
+        // Check if we have enough posts to meet the start point
+        if ($row['count'] <= $start) {
+            $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS');
+            // If there actually are posts, give a link back to the previous post page
+            if ($row['count'] > 0){
+                // Add a "newer" link
+                $_SITE_CONTENT .= $_TEMPLATE->render('PAGE_LINKS',
+                                                     array('LINK_LEFT'=>$_TEMPLATE->render('NEWER_LINK',
+                                                                                            array('PAGE_TYPE'=>$page,
+                                                                                                  'NEWER_NUMBER'=>($row['count'] - ($row['count'] % $limit))))));
+            }
+        } else {
+            if ($_SESSION['LOGGED_IN']) {
+                // Show all posts, count all comments
+                $query = "SELECT p.`id`, p.`title`, p.`content`, p.`publish_date`, count(c.`id`) as `comments`
+                          FROM `".DB_PREF."posts` p
+                          LEFT JOIN `".DB_PREF."comments` c ON p.`id` = c.`post_id`
+                          WHERE p.`publish_date` IS NOT NULL
+                          AND `p.type`='post'
+                          GROUP BY p.`id`
+                          ORDER BY p.`publish_date` DESC
+                          LIMIT $start,$limit";
+            } else {
+                // get or create a unique key for the user
+                $key = get_user_key();
+                
+                // Show all posts, count visible comments and comments by the user
+                $query = "SELECT p.`id`, p.`title`, p.`content`, p.`publish_date`, count(c.`id`) as `comments`
+                          FROM `".DB_PREF."posts` p
+                          LEFT JOIN `".DB_PREF."comments` c ON p.`id` = c.`post_id`
+                                                            AND (c.`visible`=1
+                                                                   OR
+                                                                 c.`author_hash`='$key')
+                          WHERE p.`publish_date` IS NOT NULL
+                          AND `p.type`='post'
+                          GROUP BY p.`id`
+                          ORDER BY p.`publish_date` DESC
+                          LIMIT $start,$limit";
+            }
+            
+            $result = run_query($query);
+            
+            $_SITE_CONTENT = "";
+            
+            // add a summary for each matching post
+            while ($postrow = mysqli_fetch_assoc) {
+                // format everything
+                $url = basename(__FILE__).'?p=post&amp;id='.$postrow['id'];
+                $title = markdown($postrow['title'],false,false);
+                $summary = summarize($postrow['content']);
+                $comments = ($postrow['comments']==1?'1 comment':intval($postrow['comments']).' comments');
+                
+                // and add the post
+                $_SITE_CONTENT .= $_TEMPLATE->render('BLOG_SUMMARY',
+                                                     array('BLOG_URL'=>$url,
+                                                           'BLOG_TITLE'=>$title,
+                                                           'BLOG_SUMMARY'=>$summary,
+                                                           'COMMENT_COUNT'=>$comments));
+            }
+            
+            // Check if there are newer posts or older posts
+            $older = $newer = "";
+            
+            // Add a 'newer' link if we're not at the newest posts
+            if ($start > 0) {
+                $newer = $_TEMPLATE->render('NEWER_LINK',
+                                            array('PAGE_TYPE'=>$page,
+                                                  'NEWER_NUMBER'=>($start > $limit ? $start - $limit: 0)));
+            }
+            
+            // Add an 'older' link if we still have more posts
+            if ($row['count'] > ($start + $limit)) {
+                $older = $_TEMPLATE->render('OLDER_LINK',
+                                            array('PAGE_TYPE'=>$page,
+                                                  'OLDER_NUMBER'=>$start + $limit));
+            }
+            
+            // Add the page links (if there are any)
+            if (strlen($newer) || strlen($older)) {
+                $_SITE_CONTENT .= $_TEMPLATE->render('PAGE_LINKS',
+                                                     array('LINK_LEFT'=>$newer,
+                                                           'LINK_RIGHT'=>$older));
+            }
+        }
+        
         $_DO_RENDER = true;
         break;
 }
@@ -714,7 +840,7 @@ switch($page) {
 if ($_DO_RENDER) {
     // get some standard variables
     $site_title = htmlentities(Settings::get('sitetitle', 'BlogFile'));
-    $page_title = (isset($_PAGE_TITLE) && strlen(trim($_PAGE_TITLE))? $_PAGE_TITLE.' - '.$site_title : $site_title);
+    $page_title = (isset($_PAGE_TITLE) && strlen(trim($_PAGE_TITLE))? htmlentities(trim($_PAGE_TITLE)).' - '.$site_title : $site_title);
     $site_home = basename(__FILE__);
     $site_extra = htmlentities(Settings::get('siteextra', 'A BlogFile blog about things. And stuff.'));
     
@@ -756,11 +882,197 @@ function run_query($query) {
     return $result;
 }
 
+/** Gets the main page menu
+ * @param mixed $page The current page (for highlighing)
+ * @return string The menu HTML
+ */
 function get_menu($page=null) {
     global $_TEMPLATE;
     
     return $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__),
                                                  'LINK_TEXT'=>"Home"));
+}
+
+/** Converts text from markdown format to HTML
+ * @param string $text The text in markdown format
+ * @param bool $url True to markdown URLs
+ * @param bool $multiline Add '<p></p>' tags for \n\n and <br /> for \n 
+ * @return string The formatted HTML text
+ */
+function markdown($text,$urls=false,$multiline=true) {
+    // first step is to remove any existing HTML
+    $text = htmlentities($text);
+    
+    // check for URLs
+    if ($urls) {
+        // first do named URLs
+        $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','<a href="\1">\2</a>',$text);
+        
+        // next pick up any URLs on their own
+        $text = preg_replace('/[^"](https?:\/\/[^\s"]+)','<a href="\1">\1</a>',$text);
+    } else {
+        // turn any named URLs into plain text
+        $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','\2',$text);
+    }
+    
+    // Now we do italics
+    $text = preg_replace('/(^|[\s])_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1<em>\2</em>\3',$text);
+    
+    // Now we do bold
+    $text = preg_replace('/(^|[\s])\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1<strong>\2</strong>\3',$text);
+    
+    // Now we do fixed
+    $text = preg_replace('/(^|[\s])#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1<code>\2</code>\3',$text);
+    
+    // and now we do the multi-line stuff
+    if ($multiline) {
+        // first replace multiple new-lines with <p> tags
+        $text = "<p>".preg_replace('/\n\n+/','</p><p>',trim($text)).'</p>';
+        // replace single new-lines with <br /> tags
+        $text = str_replace("\n","<br />",$text);
+    }
+    
+    // and we're done!
+    return $text;
+}
+
+/** Returns a shortened version of the text (first 100 words)
+ * @param string $text The text to shorten
+ * @param bool $markdown True to run the text through the markdown function (and
+ *                  resolve any trailing markup)
+ * @return string The shortened text
+ */
+function summarize($text,$markdown=true) {
+    // first up, remove any named links (we'll have no links in our summary)
+    $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','\2',$text);
+    
+    // the new text
+    $text_new = "";
+    $text_len = 0;
+    
+    // are we doing markdown?
+    if ($markdown) {
+        if (strlen($text) <= 600) {
+            $text_new = markdown($text, false, true);
+        } else {
+            // markdown all the text
+            $text = markdown($text, false, true);
+            
+            // I stole this from http://alanwhipple.com/2011/05/25/php-truncate-string-preserving-html-tags-words/
+            //     but I modified it a bit, so NER.
+            preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
+            $total_length = 1; // add length for the ellipsis final character
+            $open_tags = array();
+            $truncate = '';
+            $length = 600;
+            
+            foreach ($lines as $line_matchings) {
+                // if there is any html-tag in this line, handle it and add it (uncounted) to the output
+                if (!empty($line_matchings[1])) {
+                    // if it's an "empty element" with or without xhtml-conform closing slash
+                    if (preg_match('/^<(\s*.+?\/\s*|\s*(br)(\s.+?)?)>$/is', $line_matchings[1])) {
+                        // do nothing
+                    // if tag is a closing tag
+                    } else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
+                        // delete tag from $open_tags list
+                        $pos = array_search($tag_matchings[1], $open_tags);
+                        if ($pos !== false) {
+                        unset($open_tags[$pos]);
+                        }
+                    // if tag is an opening tag
+                    } else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
+                        // add tag to the beginning of $open_tags list
+                        array_unshift($open_tags, strtolower($tag_matchings[1]));
+                    }
+                    // add html-tag to $truncate'd text
+                    $truncate .= $line_matchings[1];
+                }
+                // calculate the length of the plain text part of the line; handle entities as one character
+                $content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
+                if ($total_length+$content_length> $length) {
+                    // the number of characters which are left
+                    $left = $length - $total_length;
+                    $entities_length = 0;
+                    // search for html entities
+                    if (preg_match_all('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', $line_matchings[2], $entities, PREG_OFFSET_CAPTURE)) {
+                        // calculate the real length of all entities in the legal range
+                        foreach ($entities[0] as $entity) {
+                            if ($entity[1]+1-$entities_length <= $left) {
+                                $left--;
+                                $entities_length += strlen($entity[0]);
+                            } else {
+                                // no more characters left
+                                break;
+                            }
+                        }
+                    }
+                    $truncate .= substr($line_matchings[2], 0, $left+$entities_length);
+                    // maximum lenght is reached, so get off the loop
+                    break;
+                } else {
+                    $truncate .= $line_matchings[2];
+                    $total_length += $content_length;
+                }
+                // if the maximum length is reached, get off the loop
+                if($total_length>= $length) {
+                    break;
+                }
+            }
+            
+            $text_new = $truncate.'&hellip;';
+            
+            // close all unclosed html-tags
+            foreach ($open_tags as $tag) {
+                $text_new .= '</' . $tag . '>';
+            }
+        }
+    } else {
+        // no markdown? remove all the markdown stuff (if any)
+        $text = preg_replace('/(^|[\s])_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|[\s])\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|[\s])#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        
+        // if the whole text is short enough, use it
+        if (strlen($text) <= 600) {
+            $text_new = $text;
+        } else {
+            // split the text into complete words
+            $words = array();
+            preg_match_all('/[^\s]+/', $text, $words);
+            
+            // go through each word
+            foreach ($words[0] as $word) {
+                $word_len = strlen($word);
+                
+                // maximum length is 600, so make sure the word can fit with room
+                //    for a leading space, and the elipsis
+                if (($text_len+$word_len) < 598) {
+                    // add a leading space (if appropriate)
+                    if ($text_len) {
+                        $text_new .= " ";
+                        $text_len ++;
+                    }
+                    // add the word
+                    $text_new .= $word;
+                    $text_len += $word_len;
+                } else {
+                    // if we have text, just add an ellipsis
+                    if ($text_len) {
+                        $text_new .= "&hellip;";
+                    } else {
+                        // no text yet? what hellishly long word is this? Just split
+                        //     the damned thing... and add an ellipsis
+                        $text_new .= substr(wordwrap($word,100,'- ',true),0,599)."&hellip;";
+                    }
+                    
+                    // we've got what we came for
+                    break;
+                }
+            }
+        }
+    }
+    
+    return $text_new;
 }
 
 /*******************************************************************************
