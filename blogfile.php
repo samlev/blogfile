@@ -114,6 +114,14 @@ strong {
 code {
     font-family: monospace;
 }
+a {
+    color: #666666;
+    text-decoration: none;
+    text-shadow:2px 2px 2px #CCCCCC;
+}
+a:hover {
+    color: #AAAAAA;
+}
 
 /* Layout */
 #leftcolumn {
@@ -151,20 +159,60 @@ code {
     margin:20px 10px 20px 10px;
 }
 #sitetitle a {
-    text-decoration: none;
     text-shadow:2px 2px 2px #CCCCCC;
-    color: #333333;
 }
-#sitetitle a:hover {
-    color: #999999;
-}
-
 #siteextra {
     margin:20px 10px 20px 30px;
     color: #999999;
     font-size: medium;
     font-style: italic;
     text-shadow:2px 2px 2px #EEEEEE;
+}
+#mainmenu {
+    width: 290px;
+    margin-left: 10px;
+    margin-right: 0px;
+    margin-top: 50px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.menuitem {
+    display:block;
+    width: 100%;
+}
+.menuitem a {
+    display: block;
+    width: 100%;
+    background: none;
+    padding: 3px 0px;
+}
+.menuitem a:hover {
+    /* IE10 */ 
+    background-image: -ms-linear-gradient(left, #FFFFFF 80%, #EEEEEE 85%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(left, #FFFFFF 80%, #EEEEEE 85%);
+    /* Opera */ 
+    background-image: -o-linear-gradient(left, #FFFFFF 80%, #EEEEEE 85%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, right top, color-stop(0.8, #FFFFFF), color-stop(0.85, #EEEEEE));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(left, #FFFFFF 80%, #EEEEEE 85%);
+    /* Proposed W3C Markup */ 
+    background-image: linear-gradient(left, #FFFFFF 80%, #EEEEEE 85%);
+}
+.menuitem a.current {
+    /* IE10 */ 
+    background-image: -ms-linear-gradient(left, #FFFFFF 0%, #EEEEEE 5%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(left, #FFFFFF 0%, #EEEEEE 5%);
+    /* Opera */ 
+    background-image: -o-linear-gradient(left, #FFFFFF 0%, #EEEEEE 5%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, right top, color-stop(0.0, #FFFFFF), color-stop(0.05, #EEEEEE));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(left, #FFFFFF 0%, #EEEEEE 5%);
+    /* Proposed W3C Markup */ 
+    background-image: linear-gradient(left, #FFFFFF 0%, #EEEEEE 5%);
 }
 
 /* Right side */
@@ -183,6 +231,67 @@ code {
     -khtml-border-radius: 8px;
     border-radius: 8px;
 }
+.blogtitle {
+    font-size: x-large;
+    margin-bottom: 0.8em;
+    border-bottom: solid #EEEEEE 1px;
+    color: #333333;
+}
+.popularitysummary {
+    border-top: dashed 1px #EEEEEE;
+    margin-top: 0.3em;
+    padding-top: 0.3em;
+}
+.readmore {
+    float: right;
+}
+.commentcount {
+    float: left;
+}
+.byline {
+    font-size: x-small;
+    font-style: italic;
+    color: #999999;
+    float:right;
+    margin-top: -1.5em;
+}
+.adminlinks {
+    float:right;
+}
+.comment {
+    margin: 3px;
+    padding: 5px;
+    background: #F7F7F7;
+    border: dashed 1px #EEEEEE;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+}
+.commentdate {
+    float: right;
+}
+.commentinfo {
+    border-bottom: dashed 1px #DDDDDD;
+    padding-bottom: 3px;
+    margin-bottom: 0.8em;
+}
+.dead {
+    color: #AAAAAA;
+}
+.owner {
+    background: #EEEEF7;
+}
+
+
+/* common elements */
+.visclear {
+    margin: 0px !important;
+    padding: 0px !important;
+    clear: both;
+    height: 0px;
+    overflow: hidden;
+}
 
 /* Forms */
 .formfield {
@@ -194,6 +303,11 @@ code {
 .formfield input {
     margin-left: 18px;
     width: 300px;
+}
+.formfield textarea {
+    margin-left: 18px;
+    width: 300px;
+    height: 160px;
 }
 .formfield .explain {
     font-weight: normal;
@@ -220,6 +334,13 @@ code {
     background: #FFFFFF;
     padding-left: 3ex;
     text-indent: -3ex;
+}
+#whinney{
+    overflow: hidden;
+    width:0px;
+    height:0px;
+    margin:0px;
+    padding:0px;
 }
 
 .error {
@@ -262,20 +383,21 @@ code {
 <%%STARTTEMPLATE BLOG_SUMMARY%%>
 <div class="blogsummarywrapper contentwrapper">
   <div class="blogsummary">
-    <div class="blogtitle">
+    <h2 class="blogtitle">
       <a href="<%%OPENSLOT BLOG_URL%%>"><%%OPENSLOT BLOG_TITLE%%></a>
-    </div>
+    </h2>
     <div class="blogcontent">
       <%%OPENSLOT BLOG_SUMMARY%%>
     </div>
   </div>
   <div class="popularitysummary">
+    <div class="readmore">
+      <a href="<%%OPENSLOT BLOG_URL%%>">read more&hellip;</a>
+    </div>
     <div class="commentcount">
       <a href="<%%OPENSLOT BLOG_URL%%>#comments"><%%OPENSLOT COMMENT_COUNT%%></a>
     </div>
-    <div class="readmore">
-      <a href="<%%OPENSLOT BLOG_URL%%>">read more...</a>
-    </div>
+    <div class="visclear">&nbsp;</div>
   </div>
 </div>
 <%%ENDTEMPLATE BLOG_SUMMARY%%>
@@ -283,34 +405,88 @@ code {
 <%%STARTTEMPLATE BLOG_FULL%%>
 <div class="blogwrapper contentwrapper">
   <div class="blog">
-    <div class="blogtitle"><%%OPENSLOT BLOG_TITLE%%></a></div>
+    <h2 class="blogtitle"><%%OPENSLOT BLOG_TITLE%%></h2>
+    <div class="byline"><%%OPENSLOT BYLINE%%></div>
     <div class="blogcontent">
       <%%OPENSLOT BLOG_CONTENT%%>
     </div>
+    <div class="popularitysummary">
+      <%%OPENSLOT ADMIN_LINKS%%>
+      <div class="commentcount">
+        <a href="#comments"><%%OPENSLOT COMMENT_COUNT%%></a>
+      </div>
+      <div class="visclear">&nbsp;</div>
+    </div>
   </div>
   <div class="commentswrapper">
-    <a href="#comments"><%%OPENSLOT COMMENT_COUNT%%></a>
     <%%OPENSLOT COMMENT_FORM%%>
     <a name="comments"></a>
     <%%OPENSLOT BLOG_COMMENTS%%>
   </div>
-  <%%OPENSLOT ADMIN_LINKS%%>
 </div>
 <%%ENDTEMPLATE BLOG_FULL%%>
 
 <!-- comment templates -->
 <%%STARTTEMPLATE BLOG_COMMENT%%>
-<div class="comment">
+<div class="comment<%%OPENSLOT EXTRA_CLASS%%>">
   <div class="commentinfo">
+    <a name="comment-<%%OPENSLOT COMMENT_ID%%>"></a>
+    <div class="commentdate">
+      <a href="#comment-<%%OPENSLOT COMMENT_ID%%>" title="Comment <%%OPENSLOT COMMENT_ID%%>"><%%OPENSLOT COMMENT_DATE%%></a>
+    </div>
     <div class="commentername"><%%OPENSLOT COMMENTER_NAME%%></div>
-    <div class="commentdate"><%%OPENSLOT COMMENT_DATE%%></div>
   </div>
   <div class="commentbody">
     <%%OPENSLOT COMMENT_BODY%%>
   </div>
   <%%OPENSLOT ADMIN_LINKS%%>
+  <div class="visclear">&nbsp;</div>
 </div>
 <%%ENDTEMPLATE BLOG_COMMENT%%>
+
+<%%STARTTEMPLATE COMMENTER_ANONYMOUS%%>Anonymous<%%ENDTEMPLATE COMMENTER_ANONYMOUS%%>
+
+<%%STARTTEMPLATE COMMENTER_URL%%>
+<a href="<%%OPENSLOT URL%%>"><%%OPENSLOT NAME%%></a>
+<%%ENDTEMPLATE COMMENTER_URL%%>
+
+<%%STARTTEMPLATE COMMENT_ADMIN_LINKS%%>
+<div class="adminlinks">
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=editcomment&amp;id=<%%OPENSLOT COMMENT_ID%%>">edit</a> |
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=<%%OPENSLOT KILL_OR_REVIVE%%>comment&amp;id=<%%OPENSLOT COMMENT_ID%%>"><%%OPENSLOT KILL_OR_REVIVE%%></a> |
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=deletecomment&amp;id=<%%OPENSLOT COMMENT_ID%%>">delete</a>
+</div>
+<%%ENDTEMPLATE COMMENT_ADMIN_LINKS%%>
+
+<%%STARTTEMPLATE POST_ADMIN_LINKS%%>
+<div class="adminlinks">
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=edit&amp;id=<%%OPENSLOT POST_ID%%>">edit</a>
+</div>
+<%%ENDTEMPLATE POST_ADMIN_LINKS%%>
+
+<%%STARTTEMPLATE COMMENTS_LOCKED%%>
+<div class="mention">
+  Comments have been locked for this post.
+</div>
+<%%ENDTEMPLATE COMMENTS_LOCKED%%>
+
+<%%STARTTEMPLATE NO_COMMENTS%%>
+<div class="mention">
+  There are no comments yet
+</div>
+<%%ENDTEMPLATE NO_COMMENTS%%>
+
+<%%STARTTEMPLATE ADMIN_COMMENT_FORM%%>
+<form method="POST">
+  <a name="commentform"></a>
+  <input type="hidden" name="blogid" value="<%%OPENSLOT BLOG_ID%%>" />
+  <div class="formfield">
+    Comment<br />
+    <textarea name="cbody" id="commentfield"></textarea>
+  </div>
+  <input type="submit" value="Post Comment" />
+</form>
+<%%ENDTEMPLATE ADMIN_COMMENT_FORM%%>
 
 <%%STARTTEMPLATE COMMENT_FORM%%>
 <form method="POST">
@@ -319,11 +495,11 @@ code {
   <%%USETEMPLATE ANTI_SPAM%%>
   <div class="formfield">
     Name<br />
-    <input type="text" name="cname" />
+    <input type="text" name="cname" value="<%%OPENSLOT COMMENTER_NAME%%>" />
   </div>
   <div class="formfield">
     Web<br />
-    <input type="url" name="cweb" />
+    <input type="url" name="cweb" value="<%%OPENSLOT COMMENTER_URL%%>" />
   </div>
   <div class="formfield">
     Comment<br />
@@ -341,8 +517,8 @@ code {
   <input type="text" name="url" />
   <textarea name="comments"></textarea>
   <!-- and some other fields for user verification -->
-  <input type="hidden" name="" value="<%%OPENSLOT USER_IP%%>" />
-  <input type="hidden" name="" value="<%%OPENSLOT USER_HASH%%>" />
+  <input type="hidden" name="ver1" value="<%%OPENSLOT USER_IP%%>" />
+  <input type="hidden" name="ver2" value="<%%OPENSLOT USER_HASH%%>" />
 </div>
 <%%ENDTEMPLATE ANTI_SPAM%%>
 
@@ -383,8 +559,8 @@ code {
   <div id="pgleft">
     <%%OPENSLOT LINK_LEFT%%>
   </div>
+  <div class="visclear">&nbsp;</div>
 </div>
-<div class="visclear">&nbsp;</div>
 <%%ENDTEMPLATE PAGE_LINKS%%>
 
 <!-- INSTALLATION -->
@@ -699,6 +875,16 @@ if (!defined('SITE_INSTALLED')) {
 $page = $_REQUEST['p'];
 
 switch($page) {
+    case "logout" :
+        // if logged in, kill the session
+        if ($_SESSION['LOGGED_IN']) {
+            session_unset();
+        }
+        
+        // redirect to the home page
+        $_DO_REDIR = true;
+        $_REDIR_TARGET = '?p=home';
+        break;
     case "login":
         $_PAGE_TITLE = "Log In";
         
@@ -739,12 +925,196 @@ switch($page) {
             mysqli_free_result($result);
         } else {
             // show the login page
-            $_SITE_CONTENT = $_TEMPLATE->render("LOGIN_PAGE");
+            $_SITE_CONTENT = $_TEMPLATE->render("LOGIN_PAGE",array());
             $_DO_RENDER = true;
         }
         break;
+    case "post":
+        // get the post ID
+        $id = intval($_REQUEST['id']);
+        
+        // if the user is logged in, they can see all posts - otherwise, only published ones
+        if ($_SESSION['LOGGED_IN']) {
+            $query = "SELECT p.`id`, p.`title`, p.`content`, p.`publish_date`,
+                             p.`comments_locked`
+                          FROM `".DB_PREF."posts` p
+                          WHERE p.`type`='post'
+                          AND p.`id`=$id";
+        } else {
+            $query = "SELECT p.`id`, p.`title`, p.`content`, p.`publish_date`,
+                             p.`comments_locked`
+                          FROM `".DB_PREF."posts` p
+                          WHERE p.`type`='post'
+                          AND p.`publish_date` IS NOT NULL
+                          AND p.`publish_date` < NOW()
+                          AND p.`id`=$id";
+        }
+        
+        // get the post
+        $result = run_query($query);
+        $postrow = mysqli_fetch_assoc($result);
+        mysqli_free_result($result);
+        
+        // if the user can see the post, render it. Otherwise show them the 'no posts' page
+        if ($postrow) {
+            $key = get_user_key();
+            
+            // get the comment form
+            $_COMMENT_FORM = '';
+            if ($postrow['comments_locked']==0) {
+                // if logged in, use the admin comment form
+                if ($_SESSION['LOGGED_IN']) {
+                    $_COMMENT_FORM = $_TEMPLATE->render('ADMIN_COMMENT_FORM',array('BLOG_ID'=>$id));
+                } else {
+                    // make an array with information we need to know
+                    $commenter = array('BLOG_ID'=>$id,
+                                       'USER_IP'=>$_SERVER['REMOTE_ADDR'],
+                                       'USER_HASH'=>md5($key.$id.SITE_SALT));
+                    
+                    // otherwise see if we can pull out the user's latest information
+                    $query = "SELECT c.`author_name`, c.`author_web`
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`author_hash`='$key'
+                              ORDER BY c.`time_posted` DESC
+                              LIMIT 1";
+                    
+                    $result = run_query($query);
+                    $user_row = mysqli_fetch_assoc($result);
+                    mysqli_free_result($result);
+                    
+                    // if we have a last used name or URL, use them as defaults
+                    if ($user_row) {
+                        $commenter['COMMENTER_NAME'] = htmlentities($user_row['author_name']);
+                        $commenter['COMMENTER_URL'] = htmlentities($user_row['author_web']);
+                    } else {
+                        // just use the default name
+                        $commenter['COMMENTER_NAME'] = $_TEMPLATE->render('COMMENTER_ANONYMOUS',array());
+                    }
+                    
+                    // render the comment form
+                    $_COMMENT_FORM = $_TEMPLATE->render('COMMENT_FORM',$commenter);
+                }
+            } else {
+                // comments are locked
+                $_COMMENT_FORM = $_TEMPLATE->render('COMMENTS_LOCKED',array());
+            }
+            
+            // get any comments
+            if ($_SESSION['LOGGED_IN']) {
+                $query = "SELECT c.`id`, c.`author_name`, c.`author_web`, c.`comment`,
+                                 c.`time_posted`, c.`visible`, c.`author_hash`
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`post_id`=$id
+                              ORDER BY c.`time_posted` ASC, c.`id` ASC";
+            } else {
+                $query = "SELECT c.`id`, c.`author_name`, c.`author_web`, c.`comment`,
+                                 c.`time_posted`, c.`author_hash`
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`post_id`=$id
+                              AND (c.`visible` = 1
+                                     OR
+                                   c.`author_hash`='$key')
+                              ORDER BY c.`time_posted` ASC, c.`id` ASC";
+            }
+            
+            // get any comments
+            $result = run_query($query);
+            
+            $_COMMENTS = '';
+            
+            $comment_count = mysqli_num_rows($result);
+            
+            // if there are comments, show them, otherwise show "no comments"
+            if ($comment_count) {
+                $cid = 1;
+                
+                // look at each comment
+                while ($c = mysqli_fetch_assoc($result)) {
+                    $class_extra = "";
+                    // if the comment isn't alive, and the user is logged in, show it as dead
+                    if ($_SESSION['LOGGED_IN'] && $c['visible']!=1) {
+                        $class_extra .= " dead";
+                    }
+                    
+                    // check if the comment author is the blog owner
+                    if ($c['author_hash'] == 'owner') {
+                        $class_extra .= " owner";
+                        $name = htmlentities(Settings::get('displayname','The Author'));
+                    } else if (strlen($c['author_web'])) {
+                        $name = $_TEMPLATE->render('COMMENTER_URL',array('URL'=>htmlentities($c['author_web']),
+                                                                         'NAME'=>htmlentities($c['author_name'])));
+                    } else {
+                        $name = htmlentities($c['author_name']);
+                    }
+                    
+                    // markdown the content
+                    $content = markdown($c['comment'], Settings::get('allowcommenturls',false), true);
+                    
+                    // Make the date pretty
+                    $date = ucfirst(fuzzy_time($c['time_posted']));
+                    
+                    // get the admin links
+                    $links = "";
+                    if ($_SESSION['LOGGED_IN']) {
+                        $links = $_TEMPLATE->render('COMMENT_ADMIN_LINKS',array('PAGE_BASE'=>basename(__FILE__),
+                                                                                'COMMENT_ID'=>$c['id'],
+                                                                                'KILL_OR_REVIVE'=>($c['visible']==1?'kill':'revive')));
+                    }
+                    
+                    // now put it together
+                    $parts = array('EXTRA_CLASS'=>$class_extra,
+                                   'COMMENT_ID'=>$cid,
+                                   'COMMENTER_NAME'=>$name,
+                                   'COMMENT_DATE'=>$date,
+                                   'COMMENT_BODY'=>$content,
+                                   'ADMIN_LINKS'=>$links);
+                    $_COMMENTS .= $_TEMPLATE->render('BLOG_COMMENT', $parts);
+                    
+                    // increment the comment ID counter
+                    $cid ++;
+                }
+            } else {
+                // only show the "no comments" text if comments aren't locked
+                if ($postrow['comments_locked']==0) {
+                    $_COMMENTS = $_TEMPLATE->render('NO_COMMENTS',array());
+                }
+            }
+            mysqli_free_result($result);
+            
+            // now render the post itself...
+            // start with the title
+            $title = markdown($postrow['title'], false, false);
+            // get the publish date
+            if ($postrow['publish_date'] != null) {
+                $byline = "Posted by ".htmlentities(Settings::get('displayname','The Author')).' '.fuzzy_time($postrow['publish_date']);
+            } else {
+                $byline = "Not published.";
+            }
+            // mark down the content
+            $content = markdown($postrow['content'], true, true);
+            
+            $parts = array('BLOG_TITLE'=>$title,
+                           'BYLINE'=>$byline,
+                           'BLOG_CONTENT'=>$content,
+                           'COMMENT_COUNT'=>($comment_count==1?'1 comment':intval($comment_count).' comments'),
+                           'COMMENT_FORM'=>$_COMMENT_FORM,
+                           'BLOG_COMMENTS'=>$_COMMENTS,
+                           'ADMIN_LINKS'=>$_TEMPLATE->render('POST_ADMIN_LINKS',array('PAGE_BASE'=>basename(__FILE__),
+                                                                                      'POST_ID'=>$postrow['id'])));
+            
+            $_SITE_CONTENT = $_TEMPLATE->render('BLOG_FULL', $parts);
+        } else {
+            // nothing that the user can see - show a 'no posts' page.
+            $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS',array());
+        }
+        
+        // ensure it renders
+        $_DO_RENDER = true;
+        break;
     case "home":
     default:
+        $page = "home";
+        
         // get the limit of posts per page
         $limit = intval(Settings::get('homepage_posts',Settings::get('posts_per_page',10)));
         
@@ -763,7 +1133,7 @@ switch($page) {
         
         // Check if we have enough posts to meet the start point
         if ($row['count'] <= $start) {
-            $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS');
+            $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS',array());
             // If there actually are posts, give a link back to the previous post page
             if ($row['count'] > 0){
                 // Add a "newer" link
@@ -779,6 +1149,7 @@ switch($page) {
                           FROM `".DB_PREF."posts` p
                           LEFT JOIN `".DB_PREF."comments` c ON p.`id` = c.`post_id`
                           WHERE p.`publish_date` IS NOT NULL
+                          AND p.`publish_date` < NOW()
                           AND p.`type`='post'
                           GROUP BY p.`id`
                           ORDER BY p.`publish_date` DESC
@@ -795,6 +1166,7 @@ switch($page) {
                                                                    OR
                                                                  c.`author_hash`='$key')
                           WHERE p.`publish_date` IS NOT NULL
+                          AND p.`publish_date` < NOW()
                           AND p.`type`='post'
                           GROUP BY p.`id`
                           ORDER BY p.`publish_date` DESC
@@ -852,6 +1224,12 @@ switch($page) {
 
 // Now to display!
 if ($_DO_RENDER) {
+    // check that we actually have site content
+    if (!isset($_SITE_CONTENT) || strlen(trim($_SITE_CONTENT))===0) {
+        // no content? give a "no posts" page
+        $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS',array());
+    }
+    
     // get some standard variables
     $site_title = htmlentities(Settings::get('sitetitle', 'BlogFile'));
     $page_title = (isset($_PAGE_TITLE) && strlen(trim($_PAGE_TITLE))? htmlentities(trim($_PAGE_TITLE)).' - '.$site_title : $site_title);
@@ -863,7 +1241,7 @@ if ($_DO_RENDER) {
                                                'SITE_TITLE'=>$site_title,
                                                'SITE_HOME'=>$site_home,
                                                'SITE_EXTRA'=>$site_extra,
-                                               'MENU_ITEMS'=>get_menu(),
+                                               'MENU_ITEMS'=>get_menu($page),
                                                'MAIN_CONTENT'=>$_SITE_CONTENT));
     
     // and that's all she wrote
@@ -926,6 +1304,97 @@ function get_user_key() {
     return $key;
 }
 
+/** Turns a date/time into a fuzzy "about X Ys ago"
+ * @param mixed $time A string representing the time, or a unix timestamp
+ * @return string The fuzzy time
+ */
+function fuzzy_time($time) {
+    $time_now = time();
+    
+    // if we're not working with a unix timestamp, use strtotime to turn it into one
+    if (!is_numeric($time)) {
+        $time = strtotime($time);
+    }
+    
+    $diff = $time_now - $time;
+    
+    // work into the future as well as the past
+    if ($diff < 0) {
+        // time is in the future
+        $format = "in %s";
+        $diff = abs($diff);
+    } else {
+        $format = "%s ago";
+    }
+    
+    $str = '';
+    
+    // find an appropriate term
+    if ($diff < 20) {
+        $str = sprintf($format, 'a few seconds');
+    } else if ($diff < 55) {
+        $str = sprintf($format, 'less than a minute');
+    } else if ($diff < 80) {
+        $str = sprintf($format, 'about a minute');
+    } else if ($diff < 100) {
+        $str = sprintf($format, 'just over a minute');
+    } else if ($diff < 160) {
+        $str = sprintf($format, 'a couple of minutes');
+    } else if ($diff < 280) {
+        $str = sprintf($format, 'a few minutes');
+    } else if ($diff < 500) {
+        $str = sprintf($format, 'about five minutes');
+    } else if ($diff < 800) {
+        $str = sprintf($format, 'about ten minutes');
+    } else if ($diff < 1200) {
+        $str = sprintf($format, 'about a quarter of an hour');
+    } else if ($diff < 2400) {
+        $str = sprintf($format, 'about half an hour');
+    } else if ($diff < 3300) {
+        $str = sprintf($format, 'about three quarters of an hour');
+    } else if ($diff < 5400) {
+        $str = sprintf($format, 'about an hour');
+    } else if ($diff < 10000) {
+        $str = sprintf($format, 'a couple of hours');
+    } else if ($diff < 30000) {
+        $str = sprintf($format, 'a few hours');
+    } else if ($diff < 60000) {
+        $str = sprintf($format, 'about half a day');
+    } else if ($diff < 155520) {
+        $str = sprintf($format, 'a day');
+    } else if ($diff < 345600) {
+        $str = sprintf($format, 'a few days');
+    } else if ($diff < 1000000) {
+        $str = sprintf($format, 'a week');
+    } else if ($diff < 1500000) {
+        $str = sprintf($format, 'a fortnight');
+    } else if ($diff < 2400000) {
+        $str = sprintf($format, 'a few weeks');
+    } else if ($diff < 4320000) {
+        $str = sprintf($format, 'a month');
+    } else if ($diff < 13000000) {
+        $str = sprintf($format, 'a few months');
+    } else if ($diff < 23328000) {
+        $str = sprintf($format, 'half a year');
+    } else if ($diff < 44000000) {
+        $str = sprintf($format, 'a year');
+    } else if ($diff < 283824000) {
+        $str = sprintf($format, 'a few years');
+    } else if ($diff < 473040000) {
+        $str = sprintf($format, 'a decade');
+    } else if ($diff < 851472000) {
+        $str = sprintf($format, 'a couple of decades');
+    } else if ($diff < 2838240000) {
+        $str = sprintf($format, 'a few decades');
+    } else if ($diff < 3468960000) {
+        $str = sprintf($format, 'a century');
+    } else {
+        $str = sprintf($format, 'over a century');
+    }
+    
+    return $str;
+}
+
 /** Gets the main page menu
  * @param mixed $page The current page (for highlighing)
  * @return string The menu HTML
@@ -933,8 +1402,21 @@ function get_user_key() {
 function get_menu($page=null) {
     global $_TEMPLATE;
     
-    return $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__),
-                                                 'LINK_TEXT'=>"Home"));
+    $menu = $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__),
+                                                  'LINK_TEXT'=>"Home",
+                                                  'LINK_CLASS'=>($page=='home'?'current':'')));
+    
+    if ($_SESSION['LOGGED_IN']) {
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=logout',
+                                                       'LINK_TEXT'=>"Log out",
+                                                       'LINK_CLASS'=>''));
+    } else {
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=login',
+                                                       'LINK_TEXT'=>"Log in",
+                                                       'LINK_CLASS'=>($page=='login'?'current':'')));
+    }
+    
+    return $menu;
 }
 
 /** Converts text from markdown format to HTML
@@ -953,7 +1435,7 @@ function markdown($text,$urls=false,$multiline=true) {
         $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','<a href="\1">\2</a>',$text);
         
         // next pick up any URLs on their own
-        $text = preg_replace('/[^"](https?:\/\/[^\s"]+)','<a href="\1">\1</a>',$text);
+        $text = preg_replace('/([^"])(https?:\/\/[^\s]+)(\s)/','\1<a href="\2">\2</a>\3',$text);
     } else {
         // turn any named URLs into plain text
         $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','\2',$text);
