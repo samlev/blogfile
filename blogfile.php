@@ -105,6 +105,15 @@ p {
 p:first-child {
     margin-top: 0px;
 }
+em {
+    font-style: italic;
+}
+strong {
+    font-weight: bold;
+}
+code {
+    font-family: monospace;
+}
 
 /* Layout */
 #leftcolumn {
@@ -511,6 +520,11 @@ $_TEMPLATE->parse_templates(ob_get_clean(), TEMPLATE_IGNORE);
 // start the user session
 session_start();
 
+// initialize the session
+if (!isset($_SESSION['LOGGED_IN'])) {
+    $_SESSION['LOGGED_IN'] = false;
+}
+
 // The config file is a hidden file named after the current file; this allows
 //     multiple installations in a single folder
 include_once('.bg-config.'.basename(__FILE__));
@@ -765,7 +779,7 @@ switch($page) {
                           FROM `".DB_PREF."posts` p
                           LEFT JOIN `".DB_PREF."comments` c ON p.`id` = c.`post_id`
                           WHERE p.`publish_date` IS NOT NULL
-                          AND `p.type`='post'
+                          AND p.`type`='post'
                           GROUP BY p.`id`
                           ORDER BY p.`publish_date` DESC
                           LIMIT $start,$limit";
@@ -781,7 +795,7 @@ switch($page) {
                                                                    OR
                                                                  c.`author_hash`='$key')
                           WHERE p.`publish_date` IS NOT NULL
-                          AND `p.type`='post'
+                          AND p.`type`='post'
                           GROUP BY p.`id`
                           ORDER BY p.`publish_date` DESC
                           LIMIT $start,$limit";
@@ -792,7 +806,7 @@ switch($page) {
             $_SITE_CONTENT = "";
             
             // add a summary for each matching post
-            while ($postrow = mysqli_fetch_assoc) {
+            while ($postrow = mysqli_fetch_assoc($result)) {
                 // format everything
                 $url = basename(__FILE__).'?p=post&amp;id='.$postrow['id'];
                 $title = markdown($postrow['title'],false,false);
@@ -880,6 +894,36 @@ function run_query($query) {
     }
     
     return $result;
+}
+
+/** Creates or generates a unique identification key for the user, and stores it in a cookie
+ * @return string The identification key
+ */
+function get_user_key() {
+    // site owner is different
+    if ($_SESSION['LOGGED_IN']) {
+        return 'owner';
+    }
+    
+    // ensure that the cookie key is unique to this installation
+    $cookie_key = 'userkey'.md5(basename(__FILE__));
+    
+    // check if there's an existing key, and if the key is valid.
+    if (isset($_COOKIE[$cookie_key]) && preg_match('/[a-f0-9]{32}/i',$_COOKIE[$cookie_key])) {
+        $key = $_COOKIE[$cookie_key];
+    } else {
+        // Generate a key for the user based on their IP and useragent. This isn't
+        //     100% bullet proof, but it should be good enough to pick up some
+        //     users who clear their cookies. It may possibly also catch two users
+        //     in the same house, using similar computers, but I don't care.
+        $key = md5($_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR'].SITE_SALT);
+    }
+    
+    // set the cookie to expire in a year.
+    setcookie($cookie_key,$key,time()+31536000);
+    
+    // and send back the key
+    return $key;
 }
 
 /** Gets the main page menu
