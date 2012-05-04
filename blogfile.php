@@ -479,6 +479,7 @@ a:hover {
 <%%STARTTEMPLATE ADMIN_COMMENT_FORM%%>
 <form method="POST">
   <a name="commentform"></a>
+  <input type="hidden" name="p" value="comment" />
   <input type="hidden" name="blogid" value="<%%OPENSLOT BLOG_ID%%>" />
   <div class="formfield">
     Comment<br />
@@ -491,6 +492,7 @@ a:hover {
 <%%STARTTEMPLATE COMMENT_FORM%%>
 <form method="POST">
   <a name="commentform"></a>
+  <input type="hidden" name="p" value="comment" />
   <input type="hidden" name="blogid" value="<%%OPENSLOT BLOG_ID%%>" />
   <%%USETEMPLATE ANTI_SPAM%%>
   <div class="formfield">
@@ -883,7 +885,7 @@ switch($page) {
         
         // redirect to the home page
         $_DO_REDIR = true;
-        $_REDIR_TARGET = '?p=home';
+        $_REDIR_TARGET = basename(__FILE__);
         break;
     case "login":
         $_PAGE_TITLE = "Log In";
@@ -891,7 +893,7 @@ switch($page) {
         if ($_SESSION['LOGGED_IN']) {
             // already logged in? just bounce to the home page
             $_DO_REDIR = true;
-            $_REDIR_TARGET = '?p=home';
+            $_REDIR_TARGET = basename(__FILE__);
         } else if(isset($_POST['password'])) {
             // attempt to log in
             $pword = md5(sha1($_POST['password'].SITE_SALT).SITE_SALT);
@@ -903,7 +905,7 @@ switch($page) {
                 
                 // bounce to the home page
                 $_DO_REDIR = true;
-                $_REDIR_TARGET = '?p=home';
+                $_REDIR_TARGET = basename(__FILE__);
             } else {
                 // impose a short wait (as an attempt at slowing brute-force attacks)
                 if (isset($_SESSION['LOGGED_IN_WAIT'])) {
@@ -1110,6 +1112,174 @@ switch($page) {
         
         // ensure it renders
         $_DO_RENDER = true;
+        break;
+    case "comment":
+        // The user key should always be either an md5 hash, or 'owner', so it's
+        //     SQL safe. If you went and changed it so it returns something else,
+        //     then you can deal with it.
+        $key = get_user_key();
+        
+        // ensure we redirect
+        $_DO_REDIR = true;
+        $blogid = intval($_POST['blogid']);
+        $_REDIR_TARGET = basename(__FILE__)."?p=post&id=".$blogid."#comments";
+        
+        // for adding comments, deal with admin and regular users separately
+        if ($_SESSION['LOGGED_IN']) {
+            // get the comment, and we're pretty much done (so long as it's not blank)
+            $comment = trim($_POST['cbody']);
+            
+            // check that we have a comment
+            if (strlen($comment)) {
+                // cool, let's post it! (Admin's don't need no stinkin' rules about
+                //     comments being locked, or posts being published, or posts
+                //     actually existing. If you're an admin and you changed the
+                //     code to post to a blogid which doesn't exist, then you
+                //     must have a reason. I mean, you could just update the database
+                //     if you really wanted to. Why should I throw roadblocks in
+                //     your way? That's not cool.)
+                $query = "INSERT INTO `".DB_PREF."comments`
+                                (`post_id`,`comment`,`time_posted`,`visible`,`author_hash`)
+                          VALUES ($blogid, '".mysqli_real_escape_string($_MYSQLI, $comment)."', NOW(), 1, '$key')";
+                
+                run_query($query);
+            }
+        } else {
+            // Here be roadblocks! First one - is the comment empty?
+            $comment = trim($_POST['cbody']);
+            
+            if (strlen($comment)) {
+                // next roadblock... does the post exist, can it be seen, and are comments open?
+                $query = "SELECT p.`id`
+                          FROM `".DB_PREF."posts` p
+                          WHERE p.`type`='post'
+                          AND p.`publish_date` IS NOT NULL
+                          AND p.`publish_date` < NOW()
+                          AND p.`comments_locked` = 0
+                          AND p.`id`=$blogid";
+                
+                $result = run_query($query);
+                $rows = mysqli_num_rows($result);
+                mysqli_free_result($result);
+                
+                if ($rows) {
+                    // default to autopublish 
+                    $visible = 1;
+                    
+                    // start by trusting people with an automatic karma of 10
+                    $karma = 10;
+                    
+                    // Next roadblock... check the honeypot
+                    if (strlen($_POST['name'].$_POST['email'].$_POST['url']) ||
+                            $_POST['ver1'] != $_SERVER['REMOTE_ADDR'] ||
+                            $_POST['ver2'] != md5($key.$blogid.SITE_SALT)) {
+                        // Flag the user as a spammer
+                        Settings::set('spammer',$key,false);
+                        
+                        // flag the comment as spam (won't be published)
+                        $visible = -2;
+                        
+                        // take off some karma
+                        $karma -= 20;
+                    }
+                    
+                    // check to find the post breakdown of the user
+                    $query = "SELECT 'total' as `k`, count(c.`id`) as v
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`author_hash`='$key'
+                              GROUP BY c.`author_hash`
+                                UNION
+                              SELECT 'totalvisible' as `k`, count(c.`id`) as v
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`author_hash`='$key'
+                              AND c.`visible`=1
+                              GROUP BY c.`author_hash`
+                                UNION
+                              SELECT 'totaldead' as `k`, count(c.`id`) as v
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`author_hash`='$key'
+                              AND c.`visible`!=1
+                              GROUP BY c.`author_hash`
+                                UNION
+                              SELECT 'killed' as `k`, count(c.`id`) as v
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`author_hash`='$key'
+                              AND c.`visible`=0
+                              GROUP BY c.`author_hash`
+                                UNION
+                              SELECT 'autokilled' as `k`, count(c.`id`) as v
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`author_hash`='$key'
+                              AND c.`visible`=-1
+                              GROUP BY c.`author_hash`
+                                UNION
+                              SELECT 'spam' as `k`, count(c.`id`) as v
+                              FROM `".DB_PREF."comments` c
+                              WHERE c.`author_hash`='$key'
+                              AND c.`visible`=-2
+                              GROUP BY c.`author_hash`";
+                    
+                    $result = run_query($query);
+                    $breakdown = array();
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $breakdown[$row['k']] = intval($row['v']);
+                    }
+                    mysqli_free_result($result);
+                    
+                    // only analyse if the user has more posts
+                    if (count($breakdown) && $breakdown['total'] > 0) {
+                        // add 1 to the karma for every 'live'
+                        $karma += intval($breakdown['totalvisible']);
+                        // take 2 from the karma for every 'auto-killed' comment
+                        $karma -= (intval($breakdown['autokilled'])*2);
+                        // take 4 from the karma for every manually 'killed' comment
+                        $karma -= (intval($breakdown['autokilled'])*4);
+                        // take 20 from the karma for every 'spam' comment
+                        $karma -= (intval($breakdown['spam'])*20);
+                    }
+                    
+                    // take 5 from the karma for every time the user got flagged
+                    //     as a troublemaker (i.e. tried to comment on a post that
+                    //     has comments locked, was unpublished, or didn't exist)
+                    $karma -= (intval(Settings::search('troublemaker',$key))*5);
+                    
+                    // if the user has less than 0 karma, and we're still going
+                    //     to make the comment visible, auto-kill the comment
+                    if ($karma <= 0 && $visible) {
+                        $visible = -1;
+                    }
+                    
+                    // clean up the name and URL
+                    $name = trim($_POST['cname']);
+                    $web = trim($_POST['cweb']);
+                    
+                    // clean up the web - if it's not pointing to something that
+                    //     at least looks like it could be a valid http resource, dump it
+                    if (!preg_match('/^https?:\/\/[a-z0-9-]+\.([a-z0-9-]+\.)*[a-z]+(\/[^\s]*)?$/i',$web)) {
+                        $web = '';
+                    }
+                    
+                    // Now add the comment
+                    $query = "INSERT INTO `".DB_PREF."comments`
+                                (`post_id`,`comment`,`author_name`,`author_web`,
+                                 `time_posted`,`visible`,`author_hash`)
+                              VALUES ($blogid, '".mysqli_real_escape_string($_MYSQLI, $comment)."',
+                                      '".mysqli_real_escape_string($_MYSQLI, trim($_POST['cname']))."',
+                                      '".mysqli_real_escape_string($_MYSQLI, trim($_POST['cweb']))."',
+                                      NOW(), $visible, '$key')";
+                    
+                    run_query($query);
+                    
+                    // make sure we go back to the comments section of that blog
+                    $_REDIR_TARGET .= "?p=post&id=".$blogid."#comments";
+                } else {
+                    // The user was trying to post to something they shouldn't
+                    //     have... autokill future posts from this user.
+                    Settings::set('troublemaker',$key,false);
+                }
+            }
+            // silently ignore any failures in the 'empty comment' department... for now
+        }
         break;
     case "home":
     default:
@@ -1708,6 +1878,32 @@ class Settings {
                   WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'";
         
         run_query($query);
+    }
+    
+    /** Searches for a setting with a specific value, and returns the number of occurances
+     * @param string $setting The setting name
+     * @param mixed $value The value to search for
+     * @return int The number of times this setting and value occur
+     */
+    static function search($setting,$value) {
+        global $_MYSQLI;
+        
+        // search for the setting and the value
+        $query = "SELECT count(`id`) as count
+                  FROM `".DB_PREF."settings`
+                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
+                  AND `value`='".mysqli_real_escape_string($_MYSQLI,serialize($value))."'
+                  GROUP BY `value`";
+        
+        $result = run_query($query);
+        $row = mysqli_fetch_assoc($result);
+        mysqli_free_result($result);
+        
+        if ($row) {
+            return $row['count'];
+        } else {
+            return 0;
+        }
     }
 }
 
