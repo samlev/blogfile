@@ -214,6 +214,9 @@ a:hover {
     /* Proposed W3C Markup */ 
     background-image: linear-gradient(left, #FFFFFF 0%, #EEEEEE 5%);
 }
+.menuitem a.unpublished {
+    text-decoration: line-through;
+}
 
 /* Right side */
 #maincontent {
@@ -231,7 +234,7 @@ a:hover {
     -khtml-border-radius: 8px;
     border-radius: 8px;
 }
-.blogtitle {
+.blogtitle, .pagetitle {
     font-size: x-large;
     margin-bottom: 0.8em;
     border-bottom: solid #EEEEEE 1px;
@@ -299,15 +302,24 @@ a:hover {
     margin-top: 5px;
     margin-bottom: 8px;
     margin-left: 15px;
+    text-transform:capitalize;
 }
 .formfield input {
     margin-left: 18px;
     width: 300px;
 }
+.formfield input.shortfield {
+    width: 50px;
+}
 .formfield textarea {
     margin-left: 18px;
     width: 300px;
     height: 160px;
+}
+.formfield textarea.bigfield {
+    margin-left: 18px;
+    width: 500px;
+    height: 360px;
 }
 .formfield .explain {
     font-weight: normal;
@@ -321,7 +333,10 @@ a:hover {
     width: 3ex;
     height: 1.2em;
     line-height: 1.2em;
+    text-transform: none;
+    background: #FFFFFF;
 }
+
 .formfield .explain:before {
     content: "(?) ";
     font-style: normal;
@@ -331,7 +346,6 @@ a:hover {
     max-width: 300px;
     white-space: normal;
     overflow: visible;
-    background: #FFFFFF;
     padding-left: 3ex;
     text-indent: -3ex;
 }
@@ -426,6 +440,37 @@ a:hover {
 </div>
 <%%ENDTEMPLATE BLOG_FULL%%>
 
+<%%STARTTEMPLATE POST_EDIT%%>
+<form method="POST" class="contentwrapper">
+  <input type="hidden" name="p" value="savepost" />
+  <input type="hidden" name="id" value="<%%OPENSLOT POST_ID%%>" />
+  <input type="hidden" name="type" value="<%%OPENSLOT POST_TYPE%%>" />
+  <div class="error <%%OPENSLOT POST_ERROR%%>"><%%OPENSLOT ERROR_MESSAGE%%></div>
+  <div class="formfield">
+    <%%OPENSLOT POST_TYPE%%> title<br />
+    <input type="text" name="title" value="<%%OPENSLOT POST_TITLE%%>" />
+  </div>
+  <div class="formfield">
+    <%%OPENSLOT POST_TYPE%%> content<br />
+    <textarea name="content" class="bigfield"><%%OPENSLOT POST_CONTENT%%></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN_FULL%%>
+  </div>
+  <div class="formfield">
+    <input type="checkbox" name="published" class="shortfield"<%%OPENSLOT POST_PUBLISHED%%> />
+    Published
+  </div>
+  <%%OPENSLOT POST_COMMENTS%%>
+  <input type="submit" value="Save" />
+</form>
+<%%ENDTEMPLATE POST_EDIT%%>
+
+<%%STARTTEMPLATE BLOG_COMMENTS_LOCKED%%>
+  <div class="formfield">
+    <input type="checkbox" name="comments" class="shortfield"<%%OPENSLOT COMMENTS_LOCKED%%> />
+    Comments Locked
+  </div>
+<%%ENDTEMPLATE BLOG_COMMENTS_LOCKED%%>
+
 <!-- comment templates -->
 <%%STARTTEMPLATE BLOG_COMMENT%%>
 <div class="comment<%%OPENSLOT EXTRA_CLASS%%>">
@@ -452,17 +497,17 @@ a:hover {
 
 <%%STARTTEMPLATE COMMENT_ADMIN_LINKS%%>
 <div class="adminlinks">
-  <a href="<%%OPENSLOT PAGE_BASE%%>?p=editcomment&amp;id=<%%OPENSLOT COMMENT_ID%%>">edit</a> |
-  <a href="<%%OPENSLOT PAGE_BASE%%>?p=<%%OPENSLOT KILL_OR_REVIVE%%>comment&amp;id=<%%OPENSLOT COMMENT_ID%%>"><%%OPENSLOT KILL_OR_REVIVE%%></a> |
-  <a href="<%%OPENSLOT PAGE_BASE%%>?p=deletecomment&amp;id=<%%OPENSLOT COMMENT_ID%%>">delete</a>
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=editcomment&amp;id=<%%OPENSLOT COMMENT_ID%%>">edit comment</a> |
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=<%%OPENSLOT KILL_OR_REVIVE%%>comment&amp;id=<%%OPENSLOT COMMENT_ID%%>"><%%OPENSLOT KILL_OR_REVIVE%%> comment</a> |
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=deletecomment&amp;id=<%%OPENSLOT COMMENT_ID%%>">delete comment</a>
 </div>
 <%%ENDTEMPLATE COMMENT_ADMIN_LINKS%%>
 
-<%%STARTTEMPLATE POST_ADMIN_LINKS%%>
+<%%STARTTEMPLATE BLOG_ADMIN_LINKS%%>
 <div class="adminlinks">
-  <a href="<%%OPENSLOT PAGE_BASE%%>?p=edit&amp;id=<%%OPENSLOT POST_ID%%>">edit</a>
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=editpost&amp;id=<%%OPENSLOT POST_ID%%>">edit post</a>
 </div>
-<%%ENDTEMPLATE POST_ADMIN_LINKS%%>
+<%%ENDTEMPLATE BLOG_ADMIN_LINKS%%>
 
 <%%STARTTEMPLATE COMMENTS_LOCKED%%>
 <div class="mention">
@@ -484,6 +529,7 @@ a:hover {
   <div class="formfield">
     Comment<br />
     <textarea name="cbody" id="commentfield"></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN%%>
   </div>
   <input type="submit" value="Post Comment" />
 </form>
@@ -506,10 +552,56 @@ a:hover {
   <div class="formfield">
     Comment<br />
     <textarea name="cbody" id="commentfield"></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN%%>
   </div>
   <input type="submit" value="Post Comment" />
 </form>
 <%%ENDTEMPLATE COMMENT_FORM%%>
+
+<%%STARTTEMPLATE MARKDOWN_EXPLAIN%%>
+<div class="explain">
+  Basic markdown is as follows:<br />
+  Words _like this_ become itallic<br />
+  Words *like this* become bold<br />
+  Words #like this# become mono-spaced
+</div>
+<%%ENDTEMPLATE MARKDOWN_EXPLAIN%%>
+
+<%%STARTTEMPLATE MARKDOWN_EXPLAIN_FULL%%>
+<div class="explain">
+  Basic markdown is as follows:<br />
+  Words _like this_ become itallic<br />
+  Words *like this* become bold<br />
+  Words #like this# become mono-spaced<br />
+  Links will be automatically converted<br />
+  You can name a link [http://example.com like this]
+</div>
+<%%ENDTEMPLATE MARKDOWN_EXPLAIN_FULL%%>
+
+<%%STARTTEMPLATE EDIT_COMMENT%%>
+<form method="POST" class="contentwrapper">
+  <input type="hidden" name="p" value="savecomment" />
+  <input type="hidden" name="commentid" value="<%%OPENSLOT COMMENT_ID%%>" />
+  <div class="error <%%OPENSLOT COMMENT_ERROR%%>"><%%OPENSLOT ERROR_MESSAGE%%></div>
+  <div class="formfield">
+    Name<br />
+    <input type="text" name="name" value="<%%OPENSLOT COMMENTER_NAME%%>" />
+  </div>
+  <div class="formfield">
+    Web<br />
+    <input type="url" name="web" value="<%%OPENSLOT COMMENTER_URL%%>" />
+  </div>
+  <div class="formfield">
+    Comment<br />
+    <textarea name="comment"><%%OPENSLOT COMMENT%%></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN%%>
+  </div>
+  <div class="formfield">
+    Comment status: <%%OPENSLOT STATUS%%>
+  </div>
+  <input type="submit" value="Save Comment" />
+</form>
+<%%ENDTEMPLATE EDIT_COMMENT%%>
 
 <!-- These are dummy fields which aren't actually visible - they're a honeypot for screen scrapers -->
 <%%STARTTEMPLATE ANTI_SPAM%%>
@@ -545,6 +637,26 @@ a:hover {
 </div>
 <%%ENDTEMPLATE NO_POSTS%%>
 
+<%%STARTTEMPLATE PAGE%%>
+<div class="pagewrapper contentwrapper">
+  <div class="page">
+    <h2 class="pagetitle"><%%OPENSLOT PAGE_TITLE%%></h2>
+    <div class="pagecontent">
+      <%%OPENSLOT PAGE_CONTENT%%>
+    </div>
+    <%%OPENSLOT ADMIN_LINKS%%>
+    <div class="visclear">&nbsp;</div>
+  </div>
+</div>
+<%%ENDTEMPLATE PAGE%%>
+
+<%%STARTTEMPLATE PAGE_ADMIN_LINKS%%>
+<div class="adminlinks">
+  <a href="<%%OPENSLOT PAGE_BASE%%>?p=editpage&amp;id=<%%OPENSLOT POST_ID%%>">edit page</a>
+</div>
+<%%ENDTEMPLATE PAGE_ADMIN_LINKS%%>
+
+<!-- Page helper parts -->
 <%%STARTTEMPLATE NEWER_LINK%%>
 <a href="?p=<%%OPENSLOT PAGE_TYPE%%>&amp;s=<%%OPENSLOT NEWER_NUMBER%%>">&lt; Newer</a>
 <%%ENDTEMPLATE NEWER_LINK%%>
@@ -931,6 +1043,59 @@ switch($page) {
             $_DO_RENDER = true;
         }
         break;
+    case "page":
+        // ensure that we render
+        $_DO_RENDER = true;
+        
+        // get the post ID
+        $id = intval($_REQUEST['id']);
+        
+        // if the user is logged in, they can see all posts - otherwise, only published ones
+        if ($_SESSION['LOGGED_IN']) {
+            $query = "SELECT p.`title`, p.`content`
+                          FROM `".DB_PREF."posts` p
+                          WHERE p.`type`='page'
+                          AND p.`id`=$id";
+        } else {
+            $query = "SELECT p.`title`, p.`content`
+                          FROM `".DB_PREF."posts` p
+                          WHERE p.`type`='page'
+                          AND p.`publish_date` IS NOT NULL
+                          AND p.`publish_date` < NOW()
+                          AND p.`id`=$id";
+        }
+        
+        // get the page
+        $result = run_query($query);
+        $pagerow = mysqli_fetch_assoc($result);
+        mysqli_free_result($result);
+        
+        // if the user can see the page, render it. Otherwise show them the 'no posts' page
+        if ($pagerow) {
+            // get the admin links
+            $links = "";
+            if ($_SESSION['LOGGED_IN']) {
+                $links = $_TEMPLATE->render('PAGE_ADMIN_LINKS',array('PAGE_BASE'=>basename(__FILE__),
+                                                                        'POST_ID'=>$id));
+            }
+            
+            // now render the page itself...
+            // start with the title
+            $title = markdown($pagerow['title'], false, false);
+            
+            // mark down the content
+            $content = markdown($pagerow['content'], true, true);
+            
+            $parts = array('PAGE_TITLE'=>$title,
+                           'PAGE_CONTENT'=>$content,
+                           'ADMIN_LINKS'=>$links);
+            
+            $_SITE_CONTENT = $_TEMPLATE->render('PAGE', $parts);
+        } else {
+            // nothing that the user can see - show a 'no posts' page.
+            $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS',array());
+        }
+        break;
     case "post":
         // get the post ID
         $id = intval($_REQUEST['id']);
@@ -1095,14 +1260,20 @@ switch($page) {
             // mark down the content
             $content = markdown($postrow['content'], true, true);
             
+            // get the admin links
+            $links = "";
+            if ($_SESSION['LOGGED_IN']) {
+                $links = $_TEMPLATE->render('BLOG_ADMIN_LINKS',array('PAGE_BASE'=>basename(__FILE__),
+                                                                     'POST_ID'=>$id));
+            }
+            
             $parts = array('BLOG_TITLE'=>$title,
                            'BYLINE'=>$byline,
                            'BLOG_CONTENT'=>$content,
                            'COMMENT_COUNT'=>($comment_count==1?'1 comment':intval($comment_count).' comments'),
                            'COMMENT_FORM'=>$_COMMENT_FORM,
                            'BLOG_COMMENTS'=>$_COMMENTS,
-                           'ADMIN_LINKS'=>$_TEMPLATE->render('POST_ADMIN_LINKS',array('PAGE_BASE'=>basename(__FILE__),
-                                                                                      'POST_ID'=>$postrow['id'])));
+                           'ADMIN_LINKS'=>$links);
             
             $_SITE_CONTENT = $_TEMPLATE->render('BLOG_FULL', $parts);
         } else {
@@ -1264,8 +1435,8 @@ switch($page) {
                                 (`post_id`,`comment`,`author_name`,`author_web`,
                                  `time_posted`,`visible`,`author_hash`)
                               VALUES ($blogid, '".mysqli_real_escape_string($_MYSQLI, $comment)."',
-                                      '".mysqli_real_escape_string($_MYSQLI, trim($_POST['cname']))."',
-                                      '".mysqli_real_escape_string($_MYSQLI, trim($_POST['cweb']))."',
+                                      '".mysqli_real_escape_string($_MYSQLI, $name)."',
+                                      '".mysqli_real_escape_string($_MYSQLI, $web)."',
                                       NOW(), $visible, '$key')";
                     
                     run_query($query);
@@ -1279,6 +1450,354 @@ switch($page) {
                 }
             }
             // silently ignore any failures in the 'empty comment' department... for now
+        }
+        break;
+    case "addpage":
+    case "addpost":
+    case "editpost":
+    case "editpage":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // Get the post ID (none or a negative defaults to 0)
+            $postid = (isset($_REQUEST['id'])?(intval($_REQUEST['id'])>0?intval($_REQUEST['id']):0):0);
+            // default post type to a blog post
+            $posttype = (strstr($page,'page')?'page':'post');
+            // add some default text
+            $posttitle = "";
+            $postcontent = "";
+            $postpublished = '';
+            $commentslocked = '';
+            
+            // Look for a post with the id passed
+            $query = "SELECT p.`title`, p.`content`, p.`type`, p.`publish_date`, p.`comments_locked`
+                      FROM `".DB_PREF."posts` p
+                      WHERE p.`id`=$postid";
+            $result = run_query($query);
+            $row = mysqli_fetch_assoc($result);
+            
+            // if we have a row, update the defaults
+            if ($row) {
+                $posttype = $row['type'];
+                $posttitle = $row['title'];
+                $postcontent = $row['content'];
+                $postpublished = ($row['publish_date'] == null? '' : ' checked="checked"');
+                $commentslocked = ($row['comments_locked'] == 0? '' : ' checked="checked"');
+            } else {
+                // No post found? make sure that this is a new post, then
+                $postid = 0;
+            }
+            
+            // Render the 'comments locked' if this is a blog
+            $comments = '';
+            if ($posttype == 'post') {
+                $comments = $_TEMPLATE->render('BLOG_COMMENTS_LOCKED',array('COMMENTS_LOCKED'=>$commentslocked));
+            }
+            
+            // Now render the page
+            $_DO_RENDER = true;
+            $_SITE_CONTENT = $_TEMPLATE->render('POST_EDIT', array('POST_ID'=>$postid,
+                                                                   'POST_TYPE'=>$posttype,
+                                                                   'POST_TITLE'=>htmlentities($posttitle),
+                                                                   'POST_CONTENT'=>htmlentities($postcontent),
+                                                                   'POST_PUBLISHED'=>$postpublished,
+                                                                   'POST_COMMENTS'=>$comments));
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "savepost":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // grab the important things
+            $postid = intval($_POST['id']);
+            $posttype = trim($_POST['type']);
+            $posttitle = trim($_POST['title']);
+            $postcontent = trim($_POST['content']);
+            $postpublished = isset($_POST['published']);
+            $commentslocked = isset($_POST['comments']);
+            
+            // initialise the error handler
+            $error = '';
+            
+            // Check that we're using a valid post type
+            if (in_array($posttype, array('post','page','link','text'))) {
+                // Title can't be empty (The body can, though.)
+                if (strlen($posttitle)) {
+                    // Do we have a post id?
+                    if ($postid > 0) {
+                        // update an existing post (and ensure that the post type can't change)
+                        $query = "UPDATE `".DB_PREF."posts`
+                                  SET `title` = '".mysqli_real_escape_string($_MYSQLI, $posttitle)."',
+                                      `content` = '".mysqli_real_escape_string($_MYSQLI, $postcontent)."',
+                                      `publish_date` = ".($postpublished?'IFNULL(`publish_date`,NOW())':'NULL').",
+                                      `comments_locked` = ".($posttype=="post"?($commentslocked?1:0):1)."
+                                  WHERE `id`=$postid
+                                  AND `type`='$posttype'";
+                        
+                        run_query($query);
+                        
+                        // check if anything was changed
+                        if (mysqli_affected_rows($_MYSQLI)==0) {
+                            // set an error message
+                            $error = "Nothing has been saved. This is because either:";
+                            $error .= "<br />- Nothing was changed.";
+                            $error .= "<br />- The post doesn't exist.";
+                            $error .= "<br />- You attempted to change the post type.";
+                        }
+                    } else {
+                        // add a new post
+                        $query = "INSERT INTO `".DB_PREF."posts`
+                                        (`title`, `content`, `type`, `publish_date`,`comments_locked`)
+                                  VALUES ('".mysqli_real_escape_string($_MYSQLI, $posttitle)."',
+                                          '".mysqli_real_escape_string($_MYSQLI, $postcontent)."',
+                                          '$posttype',
+                                          ".($postpublished?'NOW()':'NULL').",
+                                          ".($posttype=="post"?($commentslocked?1:0):1).")";
+                        
+                        run_query($query);
+                        
+                        // get the insert ID
+                        $postid = mysqli_insert_id($_MYSQLI);
+                    }
+                } else {
+                    // set an error message
+                    $error = "Title cannot be blank.";
+                }
+            } else {
+                // set an error message
+                $error = "Unknown post type '".htmlentities($posttype)."' - revereted to 'post' (press save to confirm).";
+                // set it to a blog post
+                $posttype = 'post';
+            }
+            
+            if (strlen($error)) {
+                // an unknown post type - show an error
+                $vars = array('POST_ERROR'=>"visible",
+                              'ERROR_MESSAGE'=>$error,
+                              'POST_ID'=>$postid,
+                              'POST_TYPE'=>$posttype,
+                              'POST_TITLE'=>htmlentities($posttitle),
+                              'POST_CONTENT'=>htmlentities($postcontent),
+                              'POST_PUBLISHED'=>($postpublished? ' checked="checked"': ''),
+                              'POST_COMMENTS'=>$_TEMPLATE->render('BLOG_COMMENTS_LOCKED',array('COMMENTS_LOCKED'=>($commentslocked? ' checked="checked"':''))));
+                
+                // render
+                $_DO_RENDER = true;
+                $_SITE_CONTENT = $_TEMPLATE->render('POST_EDIT', $vars);
+            } else {
+                $_DO_REDIR = true;
+                
+                // Everything worked - bounce to the view page (if it's a blog or page)
+                //     and to the 'view all' pages for links and text
+                switch($posttype) {
+                    case 'page':
+                    case 'post':
+                        $_REDIR_TARGET = basename(__FILE__).'?p='.$posttype.'&id='.$postid;
+                        break;
+                    case 'link':
+                    case 'text':
+                        $_REDIR_TARGET = basename(__FILE__).'?p=viewall'.$posttype;
+                        break;
+                    default:
+                        // this should never happen, but let's be nice about it and send the user to the home page
+                        $_REDIR_TARGET = basename(__FILE__);
+                        break;
+                }
+                
+            }
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "editcomment":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // Get the comment ID
+            $id = intval($_REQUEST['id']);
+            
+            // pull out the comment info
+            $query = "SELECT c.`comment`, c.`author_name`, c.`author_web`, c.`visible`
+                      FROM `".DB_PREF."comments` c
+                      WHERE c.`id` = $id";
+            
+            $result = run_query($query);
+            $row = mysqli_fetch_assoc($result);
+            mysqli_free_result($result);
+            
+            // check if the comment exists
+            if ($row) {
+                // The statuses that a comment can have
+                $statuses = array(1=>'Alive',0=>'Killed',-1=>'Auto-killed',-2=>'Spam');
+                
+                // get all the variables we'll need
+                $vars = array('COMMENT_ID'=>$id,
+                              'COMMENTER_NAME'=>htmlentities($row['author_name']),
+                              'COMMENTER_URL'=>htmlentities($row['author_web']),
+                              'COMMENT'=>htmlentities($row['comment']),
+                              'STATUS'=>$statuses[$row['visible']]);
+                
+                // Now render the page
+                $_DO_RENDER = true;
+                $_SITE_CONTENT = $_TEMPLATE->render('EDIT_COMMENT', $vars);
+            } else {
+                // Bounce the user back to the home page
+                $_DO_REDIR = true;
+                $_REDIR_TARGET = basename(__FILE__);
+            }
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "savecomment":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // Get the comment ID
+            $id = intval($_REQUEST['id']);
+            
+            // pull out some comment info
+            $query = "SELECT c.`post_id`, c.`visible`
+                      FROM `".DB_PREF."comments` c
+                      WHERE c.`id` = $id";
+            
+            $result = run_query($query);
+            $row = mysqli_fetch_assoc($result);
+            mysqli_free_result($result);
+            
+            // check if the comment exists
+            if ($row) {
+                // get the other info
+                $name = trim($_POST['name']);
+                $web = trim($_POST['web']);
+                $comment = trim($_POST['comment']);
+                
+                // clean up the web - if it's not pointing to something that at
+                //     least looks like it could be a valid http resource, dump it
+                if (!preg_match('/^https?:\/\/[a-z0-9-]+\.([a-z0-9-]+\.)*[a-z]+(\/[^\s]*)?$/i',$web)) {
+                    $web = '';
+                }
+                
+                // make sure we have a comment
+                if (strlen($comment)) {
+                    // update the comment
+                    $query = "UPDATE `".DB_PREF."comments`
+                              SET `comment` = '".mysqli_real_escape_string($_MYSQLI, $comment)."',
+                                  `author_name`= '".mysqli_real_escape_string($_MYSQLI, $name)."',
+                                  `author_web` = '".mysqli_real_escape_string($_MYSQLI, $web)."'
+                              WHERE `id` = $id";
+                    
+                    run_query($query);
+                    
+                    // bounce back to the post
+                    $_DO_REDIR = true;
+                    $_REDIR_TARGET = basename(__FILE__).'?p=post&id='.intval($row['post_id']);
+                } else {
+                    // The statuses that a comment can have
+                    $statuses = array(1=>'Alive',0=>'Killed',-1=>'Auto-killed',-2=>'Spam');
+                    
+                    // get all the variables we'll need
+                    $vars = array('COMMENT_ERROR'=>"visible",
+                                  'ERROR_MESSAGE'=>"Comment cannot be blank",
+                                  'COMMENT_ID'=>$id,
+                                  'COMMENTER_NAME'=>htmlentities($name),
+                                  'COMMENTER_URL'=>htmlentities($web),
+                                  'COMMENT'=>htmlentities($comment),
+                                  'STATUS'=>$statuses[$row['visible']]);
+                    
+                    // Now render the page
+                    $_DO_RENDER = true;
+                    $_SITE_CONTENT = $_TEMPLATE->render('EDIT_COMMENT', $vars);
+                }
+            } else {
+                // Bounce the user back to the home page
+                $_DO_REDIR = true;
+                $_REDIR_TARGET = basename(__FILE__);
+            }
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "killcomment":
+    case "revivecomment":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // Get the comment ID
+            $id = intval($_REQUEST['id']);
+            
+            // pull out some comment info
+            $query = "SELECT c.`post_id`, c.`visible`
+                      FROM `".DB_PREF."comments` c
+                      WHERE c.`id` = $id";
+            
+            $result = run_query($query);
+            $row = mysqli_fetch_assoc($result);
+            mysqli_free_result($result);
+            
+            // check if the comment exists
+            if ($row) {
+                // update the comment
+                $query = "UPDATE `".DB_PREF."comments`
+                          SET `visible` = ".(strstr($page,'kill')?0:1)."
+                          WHERE `id` = $id";
+                
+                run_query($query);
+                
+                // bounce back to the post
+                $_DO_REDIR = true;
+                $_REDIR_TARGET = basename(__FILE__).'?p=post&id='.intval($row['post_id']);
+            } else {
+                // Bounce the user back to the home page
+                $_DO_REDIR = true;
+                $_REDIR_TARGET = basename(__FILE__);
+            }
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "deletecomment":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // Get the comment ID
+            $id = intval($_REQUEST['id']);
+            
+            // pull out some comment info
+            $query = "SELECT c.`post_id`, c.`visible`
+                      FROM `".DB_PREF."comments` c
+                      WHERE c.`id` = $id";
+            
+            $result = run_query($query);
+            $row = mysqli_fetch_assoc($result);
+            mysqli_free_result($result);
+            
+            // check if the comment exists
+            if ($row) {
+                // delete the comment
+                $query = "DELETE FROM `".DB_PREF."comments`
+                          WHERE `id` = $id";
+                
+                run_query($query);
+                
+                // bounce back to the post
+                $_DO_REDIR = true;
+                $_REDIR_TARGET = basename(__FILE__).'?p=post&id='.intval($row['post_id']);
+            } else {
+                // Bounce the user back to the home page
+                $_DO_REDIR = true;
+                $_REDIR_TARGET = basename(__FILE__);
+            }
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
         }
         break;
     case "home":
@@ -1482,11 +2001,13 @@ function fuzzy_time($time) {
     $time_now = time();
     
     // if we're not working with a unix timestamp, use strtotime to turn it into one
-    if (!is_numeric($time)) {
-        $time = strtotime($time);
+    if (is_numeric($time)) {
+        $t = intval($time);
+    } else {
+        $t = strtotime($time);
     }
     
-    $diff = $time_now - $time;
+    $diff = $time_now - $t;
     
     // work into the future as well as the past
     if ($diff < 0) {
@@ -1572,15 +2093,77 @@ function fuzzy_time($time) {
 function get_menu($page=null) {
     global $_TEMPLATE;
     
+    // first is the home link
     $menu = $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__),
                                                   'LINK_TEXT'=>"Home",
                                                   'LINK_CLASS'=>($page=='home'?'current':'')));
     
+    // Get all pages, links, and text items
     if ($_SESSION['LOGGED_IN']) {
+        $query = "SELECT p.`id`, p.`title`, p.`content`, p.`type`, (p.`publish_date` IS NOT NULL AND p.`publish_date` < NOW()) AS `published`
+                  FROM `".DB_PREF."posts` p
+                  WHERE p.`type` IN ('page','link','text')
+                  ORDER BY p.`publish_date` ASC";
+    } else {
+        $query = "SELECT p.`id`, p.`title`, p.`content`, p.`type`, 1 AS `published`
+                  FROM `".DB_PREF."posts` p
+                  WHERE p.`type` IN ('page','link','text')
+                  AND p.`publish_date` IS NOT NULL
+                  AND p.`publish_date` < NOW()
+                  ORDER BY p.`publish_date` ASC";
+    }
+    
+    $result = run_query($query);
+    
+    // look through every item that's not a post (that the user can see)
+    while ($row = mysqli_fetch_assoc($result)) {
+        // if the item isn't published, add a class
+        $class = "";
+        if (!$row['published']) {
+            $class = "unpublished ";
+        }
+        
+        // remove any markdown from the title
+        $text = strip_tags(markdown($row['title'],false,false));
+        
+        // get the link
+        $link = "";
+        if ($row['type']=='page') {
+            // link to the page
+            $link = basename(__FILE__).'?p=page&id='.intval($row['id']);
+        } else if ($row['type']=='link') {
+            // strip any whitespace, and everything after whitespace
+            $link = preg_replace('/^([^\s]+)\s.*$/','\1',trim($row['content']));
+        }
+        
+        // render the menu item
+        if (strlen($link)) {
+            $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>$link,
+                                                           'LINK_TEXT'=>$text,
+                                                           'LINK_CLASS'=>$class.($page==$row['type']&&intval($_REQUEST['id'])==intval($row['id'])?'current':'')));
+        } else {
+            $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>$text));
+        }
+    }
+    
+    if ($_SESSION['LOGGED_IN']) {
+        // Add a separator
+        $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
+        $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"Admin Menu"));
+        // Add post links
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=addpost',
+                                                       'LINK_TEXT'=>"New Blog Post",
+                                                       'LINK_CLASS'=>($page=='addpost'?'current':'')));
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=addpage',
+                                                       'LINK_TEXT'=>"New Page",
+                                                       'LINK_CLASS'=>($page=='addpage'?'current':'')));
+        // Logout link
         $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=logout',
                                                        'LINK_TEXT'=>"Log out",
                                                        'LINK_CLASS'=>''));
     } else {
+        // Add a separator
+        $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
         $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=login',
                                                        'LINK_TEXT'=>"Log in",
                                                        'LINK_CLASS'=>($page=='login'?'current':'')));
