@@ -26,8 +26,6 @@ ob_start();
 <head>
   <title><%%OPENSLOT PAGE_TITLE%%></title>
   <style type="text/css"><%%USETEMPLATE MAIN_CSS%%></style>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
-  <script type="text/javascript"><%%USETEMPLATE MAIN_JS%%></script>
 </head>
 <body>
   <div id="leftcolumn">
@@ -214,9 +212,6 @@ a:hover {
     /* Proposed W3C Markup */ 
     background-image: linear-gradient(left, #FFFFFF 0%, #EEEEEE 5%);
 }
-.menuitem a.unpublished {
-    text-decoration: line-through;
-}
 
 /* Right side */
 #maincontent {
@@ -295,6 +290,53 @@ a:hover {
     height: 0px;
     overflow: hidden;
 }
+.pglinks {
+    margin: 10px 30px 10px 20px;
+}
+.pglinks .pgright {
+    float: right;
+}
+.pglinks .pgleft {
+    float: left;
+}
+.pglinks a {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+    padding: 3px;
+    border: 1px solid #F7F7F7;
+}
+.pglinks .pgleft a {
+    /* IE10 */ 
+    background-image: -ms-linear-gradient(left, #FFFFFF 0%, #EEEEEE 85%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(left, #FFFFFF 0%, #EEEEEE 85%);
+    /* Opera */ 
+    background-image: -o-linear-gradient(left, #FFFFFF 0%, #EEEEEE 85%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #FFFFFF), color-stop(0.85, #EEEEEE));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(left, #FFFFFF 0%, #EEEEEE 85%);
+    /* Proposed W3C Markup */ 
+    background-image: linear-gradient(left, #FFFFFF 0%, #EEEEEE 85%);
+    border-right:none;
+}
+.pglinks .pgright a {
+    /* IE10 */ 
+    background-image: -ms-linear-gradient(left, #EEEEEE 15%, #FFFFFF 100%);
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(left, #EEEEEE 15%, #FFFFFF 100%);
+    /* Opera */ 
+    background-image: -o-linear-gradient(left, #EEEEEE 15%, #FFFFFF 100%);
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, right top, color-stop(0.15, #EEEEEE), color-stop(1, #FFFFFF));
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(left, #EEEEEE 15%, #FFFFFF 100%);
+    /* Proposed W3C Markup */ 
+    background-image: linear-gradient(left, #EEEEEE 15%, #FFFFFF 100%);
+    border-left:none;
+}
 
 /* Forms */
 .formfield {
@@ -369,14 +411,41 @@ a:hover {
 .error.visible {
     display:block;
 }
+.mention {
+    color:#AA6666;
+    background: #F7F7F7;
+    border: dashed 1px #AA6666;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    margin: 8px 3px;
+    padding: 5px;
+    display: none;
+}
+.mention.visible {
+    display:block;
+}
+
+.listtable {
+    width: 100%;
+    border-collapse: collapse;
+}
+.listtable td, .listtable th {
+    padding: 3px;
+    width: 200px;
+}
+.listtable td {
+    border-top: dashed #EEEEEE 1px;
+}
+.listtable tr td:first-child, .listtable tr th:first-child {
+    width: auto;
+}
+.listtable tr:hover td {
+    background: #EEEEFF;
+}
 <%%ENDTEMPLATE MAIN_CSS%%>
 </style>
-
-<!-- script tags are only to help code highlighters. They are not included in the template -->
-<script>
-<%%STARTTEMPLATE MAIN_JS%%>
-<%%ENDTEMPLATE MAIN_JS%%>
-</script>
 
 <!-- menu templates -->
 <%%STARTTEMPLATE MAIN_MENU%%>
@@ -510,14 +579,14 @@ a:hover {
 <%%ENDTEMPLATE BLOG_ADMIN_LINKS%%>
 
 <%%STARTTEMPLATE COMMENTS_LOCKED%%>
-<div class="mention">
+<div class="mention visible">
   Comments have been locked for this post.
 </div>
 <%%ENDTEMPLATE COMMENTS_LOCKED%%>
 
 <%%STARTTEMPLATE NO_COMMENTS%%>
-<div class="mention">
-  There are no comments yet
+<div class="mention visible">
+  There are no comments yet.
 </div>
 <%%ENDTEMPLATE NO_COMMENTS%%>
 
@@ -656,6 +725,90 @@ a:hover {
 </div>
 <%%ENDTEMPLATE PAGE_ADMIN_LINKS%%>
 
+<!-- Admin pages -->
+<%%STARTTEMPLATE LIST_POSTS%%>
+<div class="pagewrapper contentwrapper">
+  <div class="page">
+    <h2 class="pagetitle">View all <%%OPENSLOT POST_TYPE%%>s</h2>
+    <div class="pagecontent">
+      <%%OPENSLOT PAGE_CONTENT%%>
+    </div>
+  </div>
+</div>
+<%%ENDTEMPLATE LIST_POSTS%%>
+
+<%%STARTTEMPLATE LIST_NO_POSTS%%>
+<div class="mention visible">
+  There are no <%%OPENSLOT POST_TYPE%%>s. Would you like to <a href="<%%OPENSLOT URL_BASE%%>?p=add<%%OPENSLOT POST_TYPE%%>">add one</a>?
+</div>
+<%%ENDTEMPLATE LIST_NO_POSTS%%>
+
+<%%STARTTEMPLATE LIST_POSTS_TABLE%%>
+<table class="listtable">
+  <tr>
+    <th>Title</th>
+    <th>Published?</th>
+    <th>Permanently Delete</th>
+  </tr>
+  <%%OPENSLOT POST_LIST%%>
+</table>
+<%%ENDTEMPLATE LIST_POSTS_TABLE%%>
+
+<%%STARTTEMPLATE LIST_POSTS_ITEM%%>
+<tr>
+  <td><a href="<%%OPENSLOT URL_BASE%%>?p=edit<%%OPENSLOT POST_TYPE%%>&amp;id=<%%OPENSLOT POST_ID%%>"><%%OPENSLOT POST_TITLE%%></a></td>
+  <td><%%OPENSLOT POST_PUBLISHED%%></td>
+  <td>
+    <form method="POST">
+      <input type="hidden" name="p" value="delete<%%OPENSLOT POST_TYPE%%>" />
+      <input type="hidden" name="id" value="<%%OPENSLOT POST_ID%%>" />
+      <input type="checkbox" name="confirm" />
+      Confirm
+      <input type="submit" value="Delete" />
+    </form>
+  </td>
+</tr>
+<%%ENDTEMPLATE LIST_POSTS_ITEM%%>
+
+<%%STARTTEMPLATE SETTINGS_FORM%%>
+<form method="POST" class="contentwrapper">
+  <input type="hidden" name="p" value="savesettings" />
+  <div class="mention<%%OPENSLOT SETTINGS_SAVED%%>">
+    Settings saved.
+  </div>
+  <div class="formfield">
+    Password<br />
+    <input type="text" name="password" />
+    <div class="explain">Only set this if you want to change settings</div>
+  </div>
+  <div class="formfield">
+    Your Name<br />
+    <input type="text" name="displayname" value="<%%OPENSLOT SETTING_displayname%%>" />
+    <div class="explain">This will be shown on your comments and posts. Cannot be blank.</div>
+  </div>
+  <div class="formfield">
+    Site title<br />
+    <input type="text" name="sitetitle" value="<%%OPENSLOT SETTING_sitetitle%%>" />
+    <div class="explain">The large text at the top left. Cannot be blank.</div>
+  </div>
+  <div class="formfield">
+    Site extra<br />
+    <input type="text" name="siteextra" value="<%%OPENSLOT SETTING_siteextra%%>" />
+    <div class="explain">The smaller text under the site title</div>
+  </div>
+  <div class="formfield">
+    Number of posts on the home page<br />
+    <input type="number" name="homepage_posts" min="1" step="1" value="<%%OPENSLOT SETTING_homepage_posts%%>" />
+    <div class="explain">Minimum 1 - anything lower will return to the default</div>
+  </div>
+  <div class="formfield">
+    <input type="checkbox" name="allowcommenturls" class="shortfield"<%%OPENSLOT SETTING_allowcommenturls%%> />
+    Allow URLs in comments
+  </div>
+  <input type="submit" value="Save Settings" />
+</form>
+<%%ENDTEMPLATE SETTINGS_FORM%%>
+
 <!-- Page helper parts -->
 <%%STARTTEMPLATE NEWER_LINK%%>
 <a href="?p=<%%OPENSLOT PAGE_TYPE%%>&amp;s=<%%OPENSLOT NEWER_NUMBER%%>">&lt; Newer</a>
@@ -666,11 +819,11 @@ a:hover {
 <%%ENDTEMPLATE OLDER_LINK%%>
 
 <%%STARTTEMPLATE PAGE_LINKS%%>
-<div id="pglinks">
-  <div id="pgright">
+<div class="pglinks">
+  <div class="pgright">
     <%%OPENSLOT LINK_RIGHT%%>
   </div>
-  <div id="pgleft">
+  <div class="pgleft">
     <%%OPENSLOT LINK_LEFT%%>
   </div>
   <div class="visclear">&nbsp;</div>
@@ -747,7 +900,7 @@ CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>posts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `content` longtext NOT NULL,
-  `type` enum('post','page','text','link') NOT NULL,
+  `type` enum('post','page') NOT NULL,
   `publish_date` datetime DEFAULT NULL,
   `comments_locked` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
@@ -1596,10 +1749,6 @@ switch($page) {
                     case 'post':
                         $_REDIR_TARGET = basename(__FILE__).'?p='.$posttype.'&id='.$postid;
                         break;
-                    case 'link':
-                    case 'text':
-                        $_REDIR_TARGET = basename(__FILE__).'?p=viewall'.$posttype;
-                        break;
                     default:
                         // this should never happen, but let's be nice about it and send the user to the home page
                         $_REDIR_TARGET = basename(__FILE__);
@@ -1800,12 +1949,212 @@ switch($page) {
             $_REDIR_TARGET = basename(__FILE__);
         }
         break;
+    case "viewallposts":
+    case "viewallpages":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // ensure we render
+            $_DO_RENDER = true;
+            
+            // get the type of post we're trying to see all of
+            $type = (strstr($page,"posts")?"post":"page");
+            
+            // get the limit of posts per page
+            $limit = 50;
+            
+            // get the page number (if we're delving into history)
+            $start = (intval($_REQUEST['s'])>0?intval($_REQUEST['s']):0);
+            
+            // find out how many posts are available
+            $query = "SELECT count(`id`) as count
+                      FROM `".DB_PREF."posts`
+                      WHERE `type`='$type'";
+            
+            $result = run_query($query);
+            $row = mysqli_fetch_assoc($result);
+            mysqli_free_result($result);
+            
+            // Check if we have enough posts to meet the start point
+            if ($row['count'] <= $start) {
+                // If there are no posts, give a link to add some
+                if ($row['count'] == 0){
+                    // Render the 'no posts' page
+                    $_LIST_BODY = $_TEMPLATE->render('LIST_NO_POSTS',array('POST_TYPE'=>$type,
+                                                                           'URL_BASE'=>basename(__FILE__)));
+                    // render the main page
+                    $_SITE_CONTENT = $_TEMPLATE->render('LIST_POSTS',array('POST_TYPE'=>$type,
+                                                                           'PAGE_CONTENT'=>$_LIST_BODY));
+                } else {
+                    $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS',array());
+                    // Add a "newer" link
+                    $_SITE_CONTENT .= $_TEMPLATE->render('PAGE_LINKS',
+                                                         array('LINK_LEFT'=>$_TEMPLATE->render('NEWER_LINK',
+                                                                                                array('PAGE_TYPE'=>$page,
+                                                                                                      'NEWER_NUMBER'=>($row['count'] - ($row['count'] % $limit))))));
+                }
+            } else {
+                $query = "SELECT p.`id`, p.`title`, p.`publish_date`, (p.`publish_date` IS NOT NULL AND p.`publish_date` < NOW()) AS `published`
+                          FROM `".DB_PREF."posts` p
+                          WHERE p.`type`='$type'
+                          ORDER BY `published` ASC, p.`publish_date` DESC
+                          LIMIT $start,$limit";
+                
+                $result = run_query($query);
+                
+                // get the list of posts
+                $_LIST_POSTS = "";
+                while ($postrow = mysqli_fetch_assoc($result)) {
+                    $vars = array('URL_BASE'=>basename(__FILE__),
+                                  'POST_ID'=>intval($postrow['id']),
+                                  'POST_TITLE'=>strip_tags(markdown($postrow['title'],false,false)),
+                                  'POST_PUBLISHED'=>($postrow['published']?fuzzy_time($postrow['publish_date']):"<em><strong>Not Published</em></strong>"),
+                                  'POST_TYPE'=>$type);
+                    
+                    $_LIST_POSTS .= $_TEMPLATE->render('LIST_POSTS_ITEM',$vars);
+                }
+                
+                $_LIST_BODY = $_TEMPLATE->render('LIST_POSTS_TABLE',array('POST_LIST'=>$_LIST_POSTS));
+                
+                // render the main page
+                $_SITE_CONTENT = $_TEMPLATE->render('LIST_POSTS',array('POST_TYPE'=>$type,
+                                                                       'PAGE_CONTENT'=>$_LIST_BODY));
+                
+                
+                // Check if there are newer posts or older posts
+                $older = $newer = "";
+                
+                // Add a 'newer' link if we're not at the newest posts
+                if ($start > 0) {
+                    $newer = $_TEMPLATE->render('NEWER_LINK',
+                                                array('PAGE_TYPE'=>$page,
+                                                      'NEWER_NUMBER'=>($start > $limit ? $start - $limit: 0)));
+                }
+                
+                // Add an 'older' link if we still have more posts
+                if ($row['count'] > ($start + $limit)) {
+                    $older = $_TEMPLATE->render('OLDER_LINK',
+                                                array('PAGE_TYPE'=>$page,
+                                                      'OLDER_NUMBER'=>$start + $limit));
+                }
+                
+                // Add the page links (if there are any)
+                if (strlen($newer) || strlen($older)) {
+                    $_SITE_CONTENT .= $_TEMPLATE->render('PAGE_LINKS',
+                                                         array('LINK_LEFT'=>$newer,
+                                                               'LINK_RIGHT'=>$older));
+                }
+                mysqli_free_result($result);
+            }
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "deletepost":
+    case "deletepage":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // get the type of post we're trying to delete
+            $type = (strstr($page,"post")?"post":"page");
+            if ($_POST['confirm']) {
+                // get the post id
+                $id = intval($_POST['id']);
+                
+                // delete the page/post
+                $query = "DELETE FROM `".DB_PREF."posts`
+                          WHERE `id`=$id
+                          AND `type`='$type'";
+                run_query($query);
+                
+                // check if we managed to delete something
+                if (mysqli_affected_rows($_MYSQLI)) {
+                    // delete any associated comments
+                    $query = "DELETE FROM `".DB_PREF."comments`
+                              WHERE `post_id`=$id";
+                    run_query($query);
+                }
+            }
+            
+            // Bounce the user back to the 'view all' page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__).'?p=viewall'.$type.'s';
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "editsettings":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // get the current settings (and other things required to render)
+            $settings = array("SETTING_displayname"=>htmlentities(Settings::get('displayname','The Author')),
+                              "SETTING_sitetitle"=>htmlentities(Settings::get('sitetitle', 'BlogFile')),
+                              "SETTING_siteextra"=>htmlentities(Settings::get('siteextra', 'A BlogFile blog about things. And stuff.')),
+                              "SETTING_allowcommenturls"=>(Settings::get('allowcommenturls',false)?' checked="checked"':''),
+                              "SETTING_homepage_posts"=>intval(Settings::get('homepage_posts',5)));
+            
+            // and display
+            $_DO_RENDER = true;
+            $_SITE_CONTENT = $_TEMPLATE->render('SETTINGS_FORM',$settings);
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
+    case "savesettings":
+        // Check if the user is logged in
+        if ($_SESSION['LOGGED_IN']) {
+            // Get and save the settings...
+            // First is the password
+            if (isset($_POST['password']) && strlen($_POST['password'])) {
+                Settings::set('password',md5(sha1($_POST['password'].SITE_SALT).SITE_SALT), true);
+            }
+            
+            // Display name (cannot be blank)
+            if (isset($_POST['displayname']) && strlen(trim($_POST['displayname']))) {
+                Settings::set('displayname',trim($_POST['displayname']), true);
+            }
+            
+            // Site title (cannot be blank)
+            if (isset($_POST['sitetitle']) && strlen(trim($_POST['sitetitle']))) {
+                Settings::set('sitetitle',trim($_POST['sitetitle']), true);
+            }
+            
+            // Site extra
+            Settings::set('siteextra',trim($_POST['siteextra']), true);
+            
+            // Allow comment URLS
+            Settings::set('allowcommenturls',isset($_POST['allowcommenturls']), true);
+            
+            // And home page posts
+            Settings::set('homepage_posts',(intval($_POST['homepage_posts'])>0?intval($_POST['homepage_posts']):5), true);
+            
+            // Get the saved settings (and other things required to render)
+            $settings = array("SETTING_displayname"=>htmlentities(Settings::get('displayname','The Author')),
+                              "SETTING_sitetitle"=>htmlentities(Settings::get('sitetitle', 'BlogFile')),
+                              "SETTING_siteextra"=>htmlentities(Settings::get('siteextra', 'A BlogFile blog about things. And stuff.')),
+                              "SETTING_allowcommenturls"=>(Settings::get('allowcommenturls',false)?' checked="checked"':''),
+                              "SETTING_homepage_posts"=>intval(Settings::get('homepage_posts',5)),
+                              "SETTINGS_SAVED"=>" visible");
+            
+            // And display the edit form
+            $_DO_RENDER = true;
+            $_SITE_CONTENT = $_TEMPLATE->render('SETTINGS_FORM',$settings);
+        } else {
+            // Bounce the user to the home page
+            $_DO_REDIR = true;
+            $_REDIR_TARGET = basename(__FILE__);
+        }
+        break;
     case "home":
     default:
         $page = "home";
         
         // get the limit of posts per page
-        $limit = intval(Settings::get('homepage_posts',Settings::get('posts_per_page',10)));
+        $limit = intval(Settings::get('homepage_posts',5));
         
         // get the page number (if we're delving into history)
         $start = (intval($_REQUEST['s'])>0?intval($_REQUEST['s']):0);
@@ -2098,58 +2447,34 @@ function get_menu($page=null) {
                                                   'LINK_TEXT'=>"Home",
                                                   'LINK_CLASS'=>($page=='home'?'current':'')));
     
-    // Get all pages, links, and text items
-    if ($_SESSION['LOGGED_IN']) {
-        $query = "SELECT p.`id`, p.`title`, p.`content`, p.`type`, (p.`publish_date` IS NOT NULL AND p.`publish_date` < NOW()) AS `published`
-                  FROM `".DB_PREF."posts` p
-                  WHERE p.`type` IN ('page','link','text')
-                  ORDER BY p.`publish_date` ASC";
-    } else {
-        $query = "SELECT p.`id`, p.`title`, p.`content`, p.`type`, 1 AS `published`
-                  FROM `".DB_PREF."posts` p
-                  WHERE p.`type` IN ('page','link','text')
-                  AND p.`publish_date` IS NOT NULL
-                  AND p.`publish_date` < NOW()
-                  ORDER BY p.`publish_date` ASC";
-    }
+    // Get all pages
+    $query = "SELECT p.`id`, p.`title`, p.`content`, p.`type`, 1 AS `published`
+              FROM `".DB_PREF."posts` p
+              WHERE p.`type` = 'page'
+              AND p.`publish_date` IS NOT NULL
+              AND p.`publish_date` < NOW()
+              ORDER BY p.`publish_date` ASC";
     
     $result = run_query($query);
     
     // look through every item that's not a post (that the user can see)
     while ($row = mysqli_fetch_assoc($result)) {
-        // if the item isn't published, add a class
-        $class = "";
-        if (!$row['published']) {
-            $class = "unpublished ";
-        }
-        
         // remove any markdown from the title
         $text = strip_tags(markdown($row['title'],false,false));
         
         // get the link
-        $link = "";
-        if ($row['type']=='page') {
-            // link to the page
-            $link = basename(__FILE__).'?p=page&id='.intval($row['id']);
-        } else if ($row['type']=='link') {
-            // strip any whitespace, and everything after whitespace
-            $link = preg_replace('/^([^\s]+)\s.*$/','\1',trim($row['content']));
-        }
+        $link = basename(__FILE__).'?p=page&id='.intval($row['id']);
         
         // render the menu item
-        if (strlen($link)) {
-            $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>$link,
-                                                           'LINK_TEXT'=>$text,
-                                                           'LINK_CLASS'=>$class.($page==$row['type']&&intval($_REQUEST['id'])==intval($row['id'])?'current':'')));
-        } else {
-            $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>$text));
-        }
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>$link,
+                                                       'LINK_TEXT'=>$text,
+                                                       'LINK_CLASS'=>($page==$row['type']&&intval($_REQUEST['id'])==intval($row['id'])?'current':'')));
     }
     
     if ($_SESSION['LOGGED_IN']) {
         // Add a separator
         $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
-        $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"Admin Menu"));
+        $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"<strong>Admin Menu</strong>"));
         // Add post links
         $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=addpost',
                                                        'LINK_TEXT'=>"New Blog Post",
@@ -2157,6 +2482,21 @@ function get_menu($page=null) {
         $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=addpage',
                                                        'LINK_TEXT'=>"New Page",
                                                        'LINK_CLASS'=>($page=='addpage'?'current':'')));
+        // view all links
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=viewallposts',
+                                                       'LINK_TEXT'=>"View All Blog Posts",
+                                                       'LINK_CLASS'=>($page=='viewallposts'?'current':'')));
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=viewallpages',
+                                                       'LINK_TEXT'=>"View All Pages",
+                                                       'LINK_CLASS'=>($page=='viewallpages'?'current':'')));
+        // Add a separator
+        $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
+        // site settings
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=editsettings',
+                                                       'LINK_TEXT'=>"Edit Site Settings",
+                                                       'LINK_CLASS'=>($page=='editsettings'||$page=='savesettings'?'current':'')));
+        // Add a separator
+        $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
         // Logout link
         $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=logout',
                                                        'LINK_TEXT'=>"Log out",
@@ -2188,7 +2528,7 @@ function markdown($text,$urls=false,$multiline=true) {
         $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','<a href="\1">\2</a>',$text);
         
         // next pick up any URLs on their own
-        $text = preg_replace('/([^"])(https?:\/\/[^\s]+)(\s)/','\1<a href="\2">\2</a>\3',$text);
+        $text = preg_replace('/([^"])(https?:\/\/[^\s]+)(\s|$)/','\1<a href="\2">\2</a>\3',$text);
     } else {
         // turn any named URLs into plain text
         $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','\2',$text);
