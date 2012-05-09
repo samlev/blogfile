@@ -1160,7 +1160,7 @@ switch($page) {
             $_DO_REDIR = true;
             $_REDIR_TARGET = basename(__FILE__);
         } else if(isset($_POST['password'])) {
-            // attempt to log in
+            // hash the password
             $pword = md5(sha1($_POST['password'].SITE_SALT).SITE_SALT);
             
             // check if the password is correct
@@ -1172,17 +1172,6 @@ switch($page) {
                 $_DO_REDIR = true;
                 $_REDIR_TARGET = basename(__FILE__);
             } else {
-                // impose a short wait (as an attempt at slowing brute-force attacks)
-                if (isset($_SESSION['LOGGED_IN_WAIT'])) {
-                    // double the wait with each failure
-                    $_SESSION['LOGGED_IN_WAIT'] *= 2;
-                } else {
-                    // initial wait is 2 seconds
-                    $_SESSION['LOGGED_IN_WAIT'] = 2;
-                }
-                
-                sleep($_SESSION['LOGGED_IN_WAIT']);
-                
                 // re-render the login page
                 $_SITE_CONTENT = $_TEMPLATE->render("LOGIN_PAGE",array("LOGIN_ERROR"=>"visible"));
                 $_DO_RENDER = true;
@@ -1244,6 +1233,7 @@ switch($page) {
                            'ADMIN_LINKS'=>$links);
             
             $_SITE_CONTENT = $_TEMPLATE->render('PAGE', $parts);
+            $_PAGE_TITLE = strip_tags($title);
         } else {
             // nothing that the user can see - show a 'no posts' page.
             $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS',array());
@@ -1429,6 +1419,7 @@ switch($page) {
                            'ADMIN_LINKS'=>$links);
             
             $_SITE_CONTENT = $_TEMPLATE->render('BLOG_FULL', $parts);
+            $_PAGE_TITLE = strip_tags($title);
         } else {
             // nothing that the user can see - show a 'no posts' page.
             $_SITE_CONTENT = $_TEMPLATE->render('NO_POSTS',array());
@@ -1615,6 +1606,10 @@ switch($page) {
             $postid = (isset($_REQUEST['id'])?(intval($_REQUEST['id'])>0?intval($_REQUEST['id']):0):0);
             // default post type to a blog post
             $posttype = (strstr($page,'page')?'page':'post');
+            
+            // set the page title
+            $_PAGE_TITLE = (strstr($page,'add')?"New ":"Edit ").$posttype;
+            
             // add some default text
             $posttitle = "";
             $postcontent = "";
@@ -1726,7 +1721,7 @@ switch($page) {
             }
             
             if (strlen($error)) {
-                // an unknown post type - show an error
+                // Show the edit form
                 $vars = array('POST_ERROR'=>"visible",
                               'ERROR_MESSAGE'=>$error,
                               'POST_ID'=>$postid,
@@ -1739,6 +1734,7 @@ switch($page) {
                 // render
                 $_DO_RENDER = true;
                 $_SITE_CONTENT = $_TEMPLATE->render('POST_EDIT', $vars);
+                $_PAGE_TITLE = "Edit $posttype";
             } else {
                 $_DO_REDIR = true;
                 
@@ -1792,6 +1788,7 @@ switch($page) {
                 // Now render the page
                 $_DO_RENDER = true;
                 $_SITE_CONTENT = $_TEMPLATE->render('EDIT_COMMENT', $vars);
+                $_PAGE_TITLE = "Edit Comment";
             } else {
                 // Bounce the user back to the home page
                 $_DO_REDIR = true;
@@ -1861,6 +1858,7 @@ switch($page) {
                     // Now render the page
                     $_DO_RENDER = true;
                     $_SITE_CONTENT = $_TEMPLATE->render('EDIT_COMMENT', $vars);
+                    $_PAGE_TITLE = "Edit Comment";
                 }
             } else {
                 // Bounce the user back to the home page
@@ -1953,11 +1951,13 @@ switch($page) {
     case "viewallpages":
         // Check if the user is logged in
         if ($_SESSION['LOGGED_IN']) {
-            // ensure we render
-            $_DO_RENDER = true;
-            
             // get the type of post we're trying to see all of
             $type = (strstr($page,"posts")?"post":"page");
+            
+            // ensure we render
+            $_DO_RENDER = true;
+            // Add the page title
+            $_PAGE_TITLE = "View all ".$type."s";
             
             // get the limit of posts per page
             $limit = 50;
@@ -2098,6 +2098,7 @@ switch($page) {
             // and display
             $_DO_RENDER = true;
             $_SITE_CONTENT = $_TEMPLATE->render('SETTINGS_FORM',$settings);
+            $_PAGE_TITLE = "Site Settings";
         } else {
             // Bounce the user to the home page
             $_DO_REDIR = true;
@@ -2143,6 +2144,7 @@ switch($page) {
             // And display the edit form
             $_DO_RENDER = true;
             $_SITE_CONTENT = $_TEMPLATE->render('SETTINGS_FORM',$settings);
+            $_PAGE_TITLE = "Site Settings";
         } else {
             // Bounce the user to the home page
             $_DO_REDIR = true;
