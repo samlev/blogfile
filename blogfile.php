@@ -646,8 +646,8 @@ a:hover {
   Basic markdown is as follows:<br />
   Words _like this_ become itallic<br />
   Words *like this* become bold<br />
-  Words #like this# become mono-spaced<br /><br />
-  Words -like this- become struck-through
+  Words #like this# become mono-spaced<br />
+  Words -like this- become struck-through<br />
   Links will be automatically converted<br />
   You can name a link [http://example.com like this]
 </div>
