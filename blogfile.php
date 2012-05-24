@@ -112,6 +112,9 @@ strong {
 code {
     font-family: monospace;
 }
+.st {
+    text-decoration: line-through;
+}
 a {
     color: #666666;
     text-decoration: none;
@@ -377,6 +380,7 @@ a:hover {
     line-height: 1.2em;
     text-transform: none;
     background: #FFFFFF;
+    vertical-align: top;
 }
 
 .formfield .explain:before {
@@ -632,7 +636,8 @@ a:hover {
   Basic markdown is as follows:<br />
   Words _like this_ become itallic<br />
   Words *like this* become bold<br />
-  Words #like this# become mono-spaced
+  Words #like this# become mono-spaced<br />
+  Words -like this- become struck-through
 </div>
 <%%ENDTEMPLATE MARKDOWN_EXPLAIN%%>
 
@@ -641,7 +646,8 @@ a:hover {
   Basic markdown is as follows:<br />
   Words _like this_ become itallic<br />
   Words *like this* become bold<br />
-  Words #like this# become mono-spaced<br />
+  Words #like this# become mono-spaced<br /><br />
+  Words -like this- become struck-through
   Links will be automatically converted<br />
   You can name a link [http://example.com like this]
 </div>
@@ -2530,20 +2536,23 @@ function markdown($text,$urls=false,$multiline=true) {
         $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','<a href="\1">\2</a>',$text);
         
         // next pick up any URLs on their own
-        $text = preg_replace('/([^"])(https?:\/\/[^\s]+)(\s|$)/','\1<a href="\2">\2</a>\3',$text);
+        $text = preg_replace('/(^|\s)(https?:\/\/[^\s]+)(\s|$)/','\1<a href="\2">\2</a>\3',$text);
     } else {
         // turn any named URLs into plain text
         $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','\2',$text);
     }
     
     // Now we do italics
-    $text = preg_replace('/(^|[\s])_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1<em>\2</em>\3',$text);
+    $text = preg_replace('/(^|\s)_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1<em>\2</em>\3',$text);
     
     // Now we do bold
-    $text = preg_replace('/(^|[\s])\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1<strong>\2</strong>\3',$text);
+    $text = preg_replace('/(^|\s)\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1<strong>\2</strong>\3',$text);
     
     // Now we do fixed
-    $text = preg_replace('/(^|[\s])#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1<code>\2</code>\3',$text);
+    $text = preg_replace('/(^|\s)#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1<code>\2</code>\3',$text);
+    
+    // Now we do strikethrough
+    $text = preg_replace('/(^|\s)-([^\s][^\n\r]*)-([^a-zA-Z0-9]|$)/U','\1<span class="st">\2</span>\3',$text);
     
     // and now we do the multi-line stuff
     if ($multiline) {
@@ -2649,9 +2658,10 @@ function summarize($text,$markdown=true) {
         }
     } else {
         // no markdown? remove all the markdown stuff (if any)
-        $text = preg_replace('/(^|[\s])_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
-        $text = preg_replace('/(^|[\s])\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
-        $text = preg_replace('/(^|[\s])#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|\s)_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|\s)\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|\s)#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|\s)-([^\s][^\n\r]*)-([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
         
         // if the whole text is short enough, use it
         if (strlen($text) <= 600) {
