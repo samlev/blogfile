@@ -2543,16 +2543,16 @@ function markdown($text,$urls=false,$multiline=true) {
     }
     
     // Now we do italics
-    $text = preg_replace('/(^|\s)_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1<em>\2</em>\3',$text);
+    $text = preg_replace('/(^|[^a-zA-Z0-9])_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1<em>\2</em>\3',$text);
     
     // Now we do bold
-    $text = preg_replace('/(^|\s)\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1<strong>\2</strong>\3',$text);
+    $text = preg_replace('/(^|[^a-zA-Z0-9])\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1<strong>\2</strong>\3',$text);
     
     // Now we do fixed
-    $text = preg_replace('/(^|\s)#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1<code>\2</code>\3',$text);
+    $text = preg_replace('/(^|[^a-zA-Z0-9])#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1<code>\2</code>\3',$text);
     
     // Now we do strikethrough
-    $text = preg_replace('/(^|\s)-([^\s][^\n\r]*)-([^a-zA-Z0-9]|$)/U','\1<span class="st">\2</span>\3',$text);
+    $text = preg_replace('/(^|[^a-zA-Z0-9])-([^\s][^\n\r]*)-([^a-zA-Z0-9]|$)/U','\1<span class="st">\2</span>\3',$text);
     
     // and now we do the multi-line stuff
     if ($multiline) {
@@ -2658,10 +2658,10 @@ function summarize($text,$markdown=true) {
         }
     } else {
         // no markdown? remove all the markdown stuff (if any)
-        $text = preg_replace('/(^|\s)_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
-        $text = preg_replace('/(^|\s)\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
-        $text = preg_replace('/(^|\s)#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
-        $text = preg_replace('/(^|\s)-([^\s][^\n\r]*)-([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|[^a-zA-Z0-9])_([^\s][^\n\r]*)_([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|[^a-zA-Z0-9])\*([^\s][^\n\r]*)\*([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|[^a-zA-Z0-9])#([^\s][^\n\r]*)#([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
+        $text = preg_replace('/(^|[^a-zA-Z0-9])-([^\s][^\n\r]*)-([^a-zA-Z0-9]|$)/U','\1\2\3',$text);
         
         // if the whole text is short enough, use it
         if (strlen($text) <= 600) {
