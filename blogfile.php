@@ -1554,7 +1554,7 @@ switch($page) {
                         // take 2 from the karma for every 'auto-killed' comment
                         $karma -= (intval($breakdown['autokilled'])*2);
                         // take 4 from the karma for every manually 'killed' comment
-                        $karma -= (intval($breakdown['autokilled'])*4);
+                        $karma -= (intval($breakdown['killed'])*4);
                         // take 20 from the karma for every 'spam' comment
                         $karma -= (intval($breakdown['spam'])*20);
                     }
