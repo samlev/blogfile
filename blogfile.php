@@ -2333,7 +2333,7 @@ function get_user_key() {
     $cookie_key = 'userkey'.md5(basename(__FILE__));
     
     // check if there's an existing key, and if the key is valid.
-    if (isset($_COOKIE[$cookie_key]) && preg_match('/[a-f0-9]{32}/i',$_COOKIE[$cookie_key])) {
+    if (isset($_COOKIE[$cookie_key]) && preg_match('/^[a-f0-9]{32}$/i',$_COOKIE[$cookie_key])) {
         $key = $_COOKIE[$cookie_key];
     } else {
         // Generate a key for the user based on their IP and useragent. This isn't
