@@ -2308,12 +2308,18 @@ if ($_DO_RENDER) {
     die();
 }
 
-/*******************************************************************************
- *************************** START HELPER FUNCTIONS ****************************
- *******************************************************************************/
-/** Runs a MySQL query */
-function run_query($query) {
-    global $_MYSQLI;
+/**
+ * START HELPER FUNCTIONS
+ */
+
+/**
+ * Runs a MySQL query
+ * @param string $query the SQL query
+ *
+ * @return mixed
+ */
+function run_query(string $query) {
+    $_MYSQLI = &$GLOBALS['_MYSQLI'];
 
     // run the query
     $result = $_MYSQLI->query($query);
@@ -2329,7 +2335,8 @@ function run_query($query) {
     return $result;
 }
 
-/** Creates or generates a unique identification key for the user, and stores it in a cookie
+/**
+ * Creates or generates a unique identification key for the user, and stores it in a cookie
  *
  * @return string The identification key
  */
@@ -2360,7 +2367,8 @@ function get_user_key() {
     return $key;
 }
 
-/** Turns a date/time into a fuzzy "about X Ys ago"
+/**
+ * Turns a date/time into a fuzzy "about X Ys ago"
  *
  * @param mixed $time A string representing the time, or a unix timestamp
  *
@@ -2455,14 +2463,15 @@ function fuzzy_time($time) {
     return $str;
 }
 
-/** Gets the main page menu
+/**
+ * Gets the main page menu
  *
  * @param mixed $page The current page (for highlighing)
  *
  * @return string The menu HTML
  */
 function get_menu($page=null) {
-    global $_TEMPLATE;
+    $_TEMPLATE = &$GLOBALS['_TEMPLATE'];
 
     // first is the home link
     $menu = $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__),
@@ -2471,7 +2480,7 @@ function get_menu($page=null) {
 
     // Get all pages
     $query = "SELECT p.`id`, p.`title`, p.`content`, p.`type`, 1 AS `published`
-              FROM `".DB_PREF."posts` p
+              FROM `" . DB_PREF . "posts` p
               WHERE p.`type` = 'page'
               AND p.`publish_date` IS NOT NULL
               AND p.`publish_date` < NOW()
@@ -2485,12 +2494,12 @@ function get_menu($page=null) {
         $text = strip_tags(markdown($row['title'],false,false));
 
         // get the link
-        $link = basename(__FILE__).'?p=page&id='.intval($row['id']);
+        $link = basename(__FILE__) . '?p=page&id=' . intval($row['id']);
 
         // render the menu item
         $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>$link,
                                                        'LINK_TEXT'=>$text,
-                                                       'LINK_CLASS'=>($page==$row['type']&&intval($_REQUEST['id'])==intval($row['id'])?'current':'')));
+                                                       'LINK_CLASS'=>($page==$row['type'] && intval($_REQUEST['id'])==intval($row['id'])?'current':'')));
     }
 
     if ($_SESSION['LOGGED_IN']) {
@@ -2498,35 +2507,35 @@ function get_menu($page=null) {
         $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
         $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"<strong>Admin Menu</strong>"));
         // Add post links
-        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=addpost',
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__) . '?p=addpost',
                                                        'LINK_TEXT'=>"New Blog Post",
                                                        'LINK_CLASS'=>($page=='addpost'?'current':'')));
-        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=addpage',
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__) . '?p=addpage',
                                                        'LINK_TEXT'=>"New Page",
                                                        'LINK_CLASS'=>($page=='addpage'?'current':'')));
         // view all links
-        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=viewallposts',
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__) . '?p=viewallposts',
                                                        'LINK_TEXT'=>"View All Blog Posts",
                                                        'LINK_CLASS'=>($page=='viewallposts'?'current':'')));
-        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=viewallpages',
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__) . '?p=viewallpages',
                                                        'LINK_TEXT'=>"View All Pages",
                                                        'LINK_CLASS'=>($page=='viewallpages'?'current':'')));
         // Add a separator
         $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
         // site settings
-        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=editsettings',
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__) . '?p=editsettings',
                                                        'LINK_TEXT'=>"Edit Site Settings",
-                                                       'LINK_CLASS'=>($page=='editsettings'||$page=='savesettings'?'current':'')));
+                                                       'LINK_CLASS'=>($page=='editsettings' || $page=='savesettings'?'current':'')));
         // Add a separator
         $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
         // Logout link
-        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=logout',
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__) . '?p=logout',
                                                        'LINK_TEXT'=>"Log out",
                                                        'LINK_CLASS'=>''));
     } else {
         // Add a separator
         $menu .= $_TEMPLATE->render('MENU_TEXT', array('LINK_TEXT'=>"&nbsp;"));
-        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__).'?p=login',
+        $menu .= $_TEMPLATE->render('MENU_ITEM', array('LINK_URL'=>basename(__FILE__) . '?p=login',
                                                        'LINK_TEXT'=>"Log in",
                                                        'LINK_CLASS'=>($page=='login'?'current':'')));
     }
@@ -2534,15 +2543,16 @@ function get_menu($page=null) {
     return $menu;
 }
 
-/** Converts text from markdown format to HTML
+/**
+ * Converts text from markdown format to HTML
  *
  * @param string $text The text in markdown format
- * @param bool $url True to markdown URLs
- * @param bool $multiline Add '<p></p>' tags for \n\n and <br /> for \n
+ * @param boolean $urls True to markdown URLs
+ * @param boolean $multiline Add '<p></p>' tags for \n\n and <br /> for \n
  *
  * @return string The formatted HTML text
  */
-function markdown($text,$urls=false,$multiline=true) {
+function markdown(string $text, bool $urls=false, bool $multiline=true) {
     // first step is to remove any existing HTML
     $text = htmlentities($text);
 
@@ -2573,7 +2583,7 @@ function markdown($text,$urls=false,$multiline=true) {
     // and now we do the multi-line stuff
     if ($multiline) {
         // first replace multiple new-lines with <p> tags
-        $text = "<p>".preg_replace('/\n\n+/','</p><p>',trim($text)).'</p>';
+        $text = "<p>" . preg_replace('/\n\n+/','</p><p>', trim($text)) . '</p>';
         // replace single new-lines with <br /> tags
         $text = str_replace("\n","<br />",$text);
     }
@@ -2585,12 +2595,11 @@ function markdown($text,$urls=false,$multiline=true) {
 /** Returns a shortened version of the text (first 100 words)
  *
  * @param string $text The text to shorten
- * @param bool $markdown True to run the text through the markdown function (and
- *                  resolve any trailing markup)
+ * @param boolean $markdown True to run the text through the markdown function (and resolve any trailing markup)
  *
  * @return string The shortened text
  */
-function summarize($text,$markdown=true) {
+function summarize(string $text, bool $markdown=true) {
     // first up, remove any named links (we'll have no links in our summary)
     $text = preg_replace('/\[(https?:\/\/[^\s]+) ([^\]]+)\]/','\2',$text);
 
@@ -2620,12 +2629,12 @@ function summarize($text,$markdown=true) {
                     // if it's an "empty element" with or without xhtml-conform closing slash
                     if (preg_match('/^<(\s*.+?\/\s*|\s*(br)(\s.+?)?)>$/is', $line_matchings[1])) {
                         // do nothing
-                    // if tag is a closing tag
+                        // if tag is a closing tag
                     } elseif (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
                         // delete tag from $open_tags list
                         $pos = array_search($tag_matchings[1], $open_tags);
                         if ($pos !== false) {
-                        unset($open_tags[$pos]);
+                            unset($open_tags[$pos]);
                         }
                     // if tag is an opening tag
                     } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
@@ -2667,7 +2676,7 @@ function summarize($text,$markdown=true) {
                 }
             }
 
-            $text_new = $truncate.'&hellip;';
+            $text_new = $truncate . '&hellip;';
 
             // close all unclosed html-tags
             foreach ($open_tags as $tag) {
@@ -2711,7 +2720,7 @@ function summarize($text,$markdown=true) {
                     } else {
                         // no text yet? what hellishly long word is this? Just split
                         //     the damned thing... and add an ellipsis
-                        $text_new .= substr(wordwrap($word,100,'- ',true),0,599)."&hellip;";
+                        $text_new .= substr(wordwrap($word,100,'- ',true),0,599) . "&hellip;";
                     }
 
                     // we've got what we came for
@@ -2724,20 +2733,23 @@ function summarize($text,$markdown=true) {
     return $text_new;
 }
 
-/*******************************************************************************
- **************************** END HELPER FUNCTIONS *****************************
- *******************************************************************************/
+/* END HELPER FUNCTIONS */
 
-// simple static helper class for settings
+/**
+ * Class Settings
+ *
+ * simple static helper class for settings
+ */
 class Settings {
-    /** Sets a system setting, with some basic protection for some settings
+    /**
+     * Sets a system setting, with some basic protection for some settings
      *
      * @param string $setting The setting name
      * @param mixed $value The value to set
-     * @param bool $overwrite Overwrite any existing setting with the same name
+     * @param boolean $overwrite Overwrite any existing setting with the same name
      */
-    static function set($setting,$value,$overwrite=false) {
-        global $_MYSQLI;
+    public static function set(string $setting, $value, bool $overwrite=false) {
+        $_MYSQLI = &$GLOBALS['_MYSQLI'];
         // check for some 'protected' types
         switch ($setting) {
             case 'displayname':
@@ -2747,44 +2759,46 @@ class Settings {
         }
 
         // add the setting to the database
-        $query = "INSERT INTO `".DB_PREF."settings` (`setting`,`value`,`time_set`)
-                  VALUES  ('".mysqli_real_escape_string($_MYSQLI,$setting)."',
-                           '".mysqli_real_escape_string($_MYSQLI,serialize($value))."',
+        $query = "INSERT INTO `" . DB_PREF . "settings` (`setting`,`value`,`time_set`)
+                  VALUES  ('" . mysqli_real_escape_string($_MYSQLI,$setting) . "',
+                           '" . mysqli_real_escape_string($_MYSQLI,serialize($value)) . "',
                            NOW())";
         run_query($query);
 
         // check if we're overwriting (actually, we're just removing any other variables by the same name)
         if ($overwrite) {
             // remove any other entries
-            $query = "DELETE FROM `".DB_PREF."settings`
-                      WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
-                      AND `id` != ".intval($_MYSQLI->insert_id);
+            $query = "DELETE FROM `" . DB_PREF . "settings`
+                      WHERE `setting`='" . mysqli_real_escape_string($_MYSQLI,$setting) . "'
+                      AND `id` != " . intval($_MYSQLI->insert_id);
 
             run_query($query);
         }
     }
 
-    /** Gets a system setting
+    /**
+     * Gets a system setting
      *
      * @param string $setting The name of the variable to get
      * @param mixed $default The default if the setting doesn't exist
      *
      * @return mixed The value of the setting, or default.
      */
-    static function get($setting,$default=null) {
-        global $_MYSQLI;
+    public static function get(string $setting, $default=null) {
+        $_MYSQLI = &$GLOBALS['_MYSQLI'];
 
         // get the setting
         $query = "SELECT `value`
-                  FROM `".DB_PREF."settings`
-                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
+                  FROM `" . DB_PREF . "settings`
+                  WHERE `setting`='" . mysqli_real_escape_string($_MYSQLI,$setting) . "'
                   ORDER BY `id` DESC
                   LIMIT 1";
 
         $result = run_query($query);
 
         // if we got a row, unserialize it, if not, use the default.
-        if ($row = mysqli_fetch_assoc($result)) {
+        $row = mysqli_fetch_assoc($result);
+        if (! empty($row)) {
             $ret = unserialize($row['value']);
         } else {
             $ret = $default;
@@ -2797,24 +2811,26 @@ class Settings {
         return $ret;
     }
 
-    /** Simply checks if a setting exists
+    /**
+     * Simply checks if a setting exists
      *
      * @param string $setting The name of the setting
      *
-     * @return bool True if the setting exists, False if not.
+     * @return boolean True if the setting exists, False if not.
      */
-    static function exists($setting) {
-        global $_MYSQLI;
+    public static function exists(string $setting) {
+        $_MYSQLI = &$GLOBALS['_MYSQLI'];
 
         // get the setting
         $query = "SELECT `id`
-                  FROM `".DB_PREF."settings`
-                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
+                  FROM `" . DB_PREF . "settings`
+                  WHERE `setting`='" . mysqli_real_escape_string($_MYSQLI,$setting) . "'
                   LIMIT 1";
 
         $result = run_query($query);
 
-        if ($row = mysqli_fetch_assoc($result)) {
+        $row = mysqli_fetch_assoc($result);
+        if (! empty($row)) {
             $ret = true;
         } else {
             $ret = false;
@@ -2827,16 +2843,17 @@ class Settings {
         return $ret;
     }
 
-    /** Deletes a setting if it exists
+    /**
+     * Deletes a setting if it exists
      *
      * @param string $setting The name of the setting
      */
-    static function delete($setting) {
-        global $_MYSQLI;
+    public static function delete(string $setting) {
+        $_MYSQLI = &$GLOBALS['_MYSQLI'];
 
         $query = "SELECT `id`
-                  FROM `".DB_PREF."settings`
-                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'";
+                  FROM `" . DB_PREF . "settings`
+                  WHERE `setting`='" . mysqli_real_escape_string($_MYSQLI,$setting) . "'";
 
         run_query($query);
     }
@@ -2846,16 +2863,16 @@ class Settings {
      * @param string $setting The setting name
      * @param mixed $value The value to search for
      *
-     * @return int The number of times this setting and value occur
+     * @return integer The number of times this setting and value occur
      */
-    static function search($setting,$value) {
-        global $_MYSQLI;
+    static function search(string $setting, $value) {
+        $_MYSQLI = &$GLOBALS['_MYSQLI'];
 
         // search for the setting and the value
         $query = "SELECT count(`id`) as count
-                  FROM `".DB_PREF."settings`
-                  WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'
-                  AND `value`='".mysqli_real_escape_string($_MYSQLI,serialize($value))."'
+                  FROM `" . DB_PREF . "settings`
+                  WHERE `setting`='" . mysqli_real_escape_string($_MYSQLI,$setting) . "'
+                  AND `value`='" . mysqli_real_escape_string($_MYSQLI,serialize($value)) . "'
                   GROUP BY `value`";
 
         $result = run_query($query);
@@ -2870,31 +2887,42 @@ class Settings {
     }
 }
 
-/*******************************************************************************
- **************************** START TEMPLATE ENGINE ****************************
- *******************************************************************************/
-class TemplateEngine {
-    private $templates; // template library
-    private $templates_rendered; // temporary array for reducing work done, and gaining speed at the cost of memory
+/* START TEMPLATE ENGINE */
 
-    function __construct() {
+/**
+ * Class TemplateEngine
+ */
+class TemplateEngine {
+    /**
+     * @var array template library
+     */
+    private $templates;
+    /**
+     * @var array temporary array for reducing work done, and gaining speed at the cost of memory
+     */
+    private $templates_rendered;
+
+    /**
+     * TemplateEngine constructor.
+     */
+    public function __construct() {
         $this->templates = array();
         $this->templates_rendered = array();
     }
 
-    /** Parses input string to find templates, then adds templates to the template library
+    /**
+     * Parses input string to find templates, then adds templates to the template library
      *
      * @param string $input The string containing templates
-     * @param int $dupes The default action to take if a duplicate template is found
+     * @param integer $dupes The default action to take if a duplicate template is found
      *     default: Throw exception
      *     TEMPLATE_OVERWRITE: overwrite existing templates with new ones
      *     TEMPLATE_IGNORE: ignore duplicate templates (keep the original)
      *
      * @throws TemplateParseException There was an error parsing the input
-     * @throws TemplateDuplicateException A duplicate template was found, but no
-     *              duplicate action was defined.
+     * @throws TemplateDuplicateException A duplicate template was found, but no duplicate action was defined.
      */
-    function parse_templates($input, $dupes=0) {
+    public function parse_templates(string $input, int $dupes=0) {
         // split the input at the new line. We're doing this old school - one line at a time
         $input_array = explode("\n",$input);
 
@@ -2904,9 +2932,9 @@ class TemplateEngine {
         $template_lines = array();
 
         // and let's go
-        foreach ($input_array as $line_no=>$line) {
+        foreach ($input_array as $line_no => $line) {
             // we don't want index counting here - this is for user display
-            $line_no = $line_no+1;
+            $line_no ++;
 
             // are we searching for a new template to start?
             if ($template === null) {
@@ -2950,7 +2978,9 @@ class TemplateEngine {
                         $template_started = -1;
                         $template_lines = array();
                     } else {
-                        throw new TemplateDuplicateException("Error while parsing templates on line $line_no. Template '$template' already exists in library, and no duplicate action is defined");
+                        throw new TemplateDuplicateException(
+                            "Error while parsing templates on line $line_no. Template '$template' already exists in library, and no duplicate action is defined"
+                        );
                     }
                 } // no "STARTTEMPLATE" declaration - ignore this line.
             } else {
@@ -2983,18 +3013,18 @@ class TemplateEngine {
         }
     }
 
-    /** Adds a template to the template library
+    /**
+     * Adds a template to the template library
      *
      * @param Template $template The template to add.
-     * @param int $dupes The default action to take if a duplicate template is found
+     * @param integer $dupes The default action to take if a duplicate template is found
      *     default: Throw exception
      *     TEMPLATE_OVERWRITE: overwrite existing templates with new ones
      *     TEMPLATE_IGNORE: ignore duplicate templates (keep the original)
      *
-     * @throws TemplateDuplicateException A duplicate template was found, but no
-     *              duplicate action was defined.
+     * @throws TemplateDuplicateException A duplicate template was found, but no duplicate action was defined.
      */
-    function add_template(Template $template, $dupes=0) {
+    public function add_template(Template $template, int $dupes=0) {
         if (!isset($this->templates[$template->get_name()]) || ($dupes & TEMPLATE_OVERWRITE)) {
             $this->templates[$template->get_name()] = $template;
         } elseif ($dupes & TEMPLATE_IGNORE) {
@@ -3004,18 +3034,19 @@ class TemplateEngine {
         }
     }
 
-    /** Merges templates from another engine into this one.
+    /**
+     * Merges templates from another engine into this one.
      *
      * @param TemplateEngine $other The other template engine.
-     * @param int $dupes The default action to take if a duplicate template is found
+     * @param integer $dupes The default action to take if a duplicate template is found
      *     default: Throw exception
      *     TEMPLATE_OVERWRITE: overwrite existing templates with new ones
      *     TEMPLATE_IGNORE: ignore duplicate templates (keep the original)
      *
-     * @throws TemplateDuplicateException A duplicate template was found, but no
-     *              duplicate action was defined.
+     * @throws TemplateDuplicateException A duplicate template was found, but no duplicate action was defined.*
+     * @throws TemplateMissingException If a template cannot be found
      */
-    function merge_templates(TemplateEngine $other, $dupes=0) {
+    public function merge_templates(TemplateEngine $other, int $dupes=0) {
         $other_templates = $other->list_templates();
 
         // Go through the list of templates from the other template engine
@@ -3031,7 +3062,8 @@ class TemplateEngine {
         }
     }
 
-    /** Renders a template from the template library. It will automatically fill
+    /**
+     * Renders a template from the template library. It will automatically fill
      *   slots in the template with corresponding data from the slots array, and
      *   will call in and render templates required from the template library.
      *
@@ -3039,13 +3071,12 @@ class TemplateEngine {
      * @param array $slots An array of data to place in named slots
      *
      * @return string The rendered template
-     * @throws TemplateMissingException A required template could not be found in
-     *              the template library.
+     * @throws TemplateMissingException A required template could not be found in the template library.
      */
-    function render($template_name, $slots) {
+    public function render(string $template_name, array $slots) {
         if(isset($this->templates[$template_name])) {
             // get a hash for this template name and slots value
-            $hash = md5($template_name."||".var_export($slots,true));
+            $hash = md5($template_name . "||" . var_export($slots,true));
 
             // assume that anything matching the same hash would render the same
             if (!isset($this->templates_rendered[$hash])) {
@@ -3060,15 +3091,17 @@ class TemplateEngine {
         }
     }
 
-    /** Returns a list of all template names in the template library
+    /**
+     * Returns a list of all template names in the template library
      *
      * @return array The names of all templates in the library
      */
-    function list_templates() {
+    public function list_templates() {
         return array_keys($this->templates);
     }
 
-    /** Gets a named template from the template library
+    /**
+     * Gets a named template from the template library
      *
      * @param string $template_name The name of the requested template
      *
@@ -3076,7 +3109,7 @@ class TemplateEngine {
      * @throws TemplateMissingException If the template does not exist in the
      *              template library.
      */
-    function get_template($template_name) {
+    public function get_template(string $template_name) {
         if (isset($this->templates[$template_name])) {
             return $this->templates[$template_name];
         } else {
@@ -3085,13 +3118,34 @@ class TemplateEngine {
     }
 }
 
+/**
+ * Class Template
+ */
 class Template {
+    /**
+     * @var string The template content
+     */
     private $content;
+    /**
+     * @var string The template name
+     */
     private $name;
+    /**
+     * @var array The slots that can be filled in the template
+     */
     private $slots_available;
+    /**
+     * @var array Other templates required to render this template
+     */
     private $required_templates;
 
-    function __construct($content, $name) {
+    /**
+     * Template constructor.
+     *
+     * @param string $content The content of the template
+     * @param string $name The name of the template
+     */
+    public function __construct(string $content, string $name) {
         $this->content = $content;
         $this->name = $name;
         $this->required_templates = array();
@@ -3099,8 +3153,8 @@ class Template {
         $this->parse();
     }
 
-    /** Parses the template content to find available content slots, and required
-     * templates.
+    /**
+     * Parses the template content to find available content slots, and required templates.
      */
     private function parse() {
         // first search for required templates
@@ -3127,31 +3181,33 @@ class Template {
         // and we're done! That was easy!
     }
 
-    /** Returns the template name
+    /**
+     * Returns the template name
      *
      * @return string The name of the template.
      */
-    function get_name() {
+    public function get_name() {
         return $this->name;
     }
 
-    /** Renders the template
+    /**
+     * Renders the template
      *
      * @param array $slots Optional data to fill slots in the template
-     * @param TemplateEngine &$template_source A source for other required templates
+     * @param TemplateEngine $template_source A source for other required templates
      *
      * @return string The template text
-     * @throws TemplateMissingException A required template could not be found in
-     *              the template source.
-     * @throws TemplateSourceRequiredException A template source is required to
-     *              render this template, but it has not been supplied.
+     * @throws TemplateMissingException A required template could not be found in the template source.
+     * @throws TemplateSourceRequiredException A template source is required to render this template, but it has not been supplied.
      */
-    function render($slots, TemplateEngine &$template_source) {
+    public function render(array $slots, TemplateEngine &$template_source) {
         // check if we require templates, and have a source
         if (count($this->required_templates) && !isset($template_source)) {
             $c = count($this->required_templates);
             $n = $this->name;
-            throw new TemplateSourceRequiredException("Cannot render template '$n' as $c template".($c==1?' is':'s are')." required, and no template source has been supplied.");
+            throw new TemplateSourceRequiredException(
+                "Cannot render template '$n' as $c template" . ($c==1?' is':'s are') . " required, and no template source has been supplied."
+            );
         }
 
         // get a clean body to work off
@@ -3181,12 +3237,25 @@ class Template {
 
 // Template system exceptions - They add no extra functionality to exceptions but
 //     having a clear exception type can help you to figure out where things failed
+/**
+ * Class TemplateException
+ */
 class TemplateException extends Exception {}
+/**
+ * Class TemplateParseException
+ */
 class TemplateParseException extends TemplateException {}
+/**
+ * Class TemplateDuplicateException
+ */
 class TemplateDuplicateException extends TemplateException {}
+/**
+ * Class TemplateMissingException
+ */
 class TemplateMissingException extends TemplateException {}
+/**
+ * Class TemplateSourceRequiredException
+ */
 class TemplateSourceRequiredException extends TemplateException {}
 
-/*******************************************************************************
- ***************************** END TEMPLATE ENGINE *****************************
- *******************************************************************************/
+/* END TEMPLATE ENGINE */
