@@ -1134,7 +1134,7 @@ if (!defined('SITE_INSTALLED')) {
     // Now to display!
     if ($_DO_RENDER) {
         echo $_TEMPLATE->render('MAIN_HTML', $page_slots);
-    } else if ($_DO_REDIR) {
+    } elseif ($_DO_REDIR) {
         header('Location: '.$_REDIR_TARGET);
     }
     die();
@@ -1165,7 +1165,7 @@ switch($page) {
             // already logged in? just bounce to the home page
             $_DO_REDIR = true;
             $_REDIR_TARGET = basename(__FILE__);
-        } else if(isset($_POST['password'])) {
+        } elseif(isset($_POST['password'])) {
             // hash the password
             $pword = md5(sha1($_POST['password'].SITE_SALT).SITE_SALT);
             
@@ -1356,7 +1356,7 @@ switch($page) {
                     if ($c['author_hash'] == 'owner') {
                         $class_extra .= " owner";
                         $name = htmlentities(Settings::get('displayname','The Author'));
-                    } else if (strlen($c['author_web'])) {
+                    } elseif (strlen($c['author_web'])) {
                         $name = $_TEMPLATE->render('COMMENTER_URL',array('URL'=>htmlentities($c['author_web']),
                                                                          'NAME'=>htmlentities($c['author_name'])));
                     } else {
@@ -2292,7 +2292,7 @@ if ($_DO_RENDER) {
     
     // and that's all she wrote
     die();
-} else if ($_DO_REDIR) {
+} elseif ($_DO_REDIR) {
     // do a redirect
     header('Location: '.$_REDIR_TARGET);
     // stop any further processing
@@ -2321,6 +2321,7 @@ function run_query($query) {
 }
 
 /** Creates or generates a unique identification key for the user, and stores it in a cookie
+ *
  * @return string The identification key
  */
 function get_user_key() {
@@ -2351,7 +2352,9 @@ function get_user_key() {
 }
 
 /** Turns a date/time into a fuzzy "about X Ys ago"
+ *
  * @param mixed $time A string representing the time, or a unix timestamp
+ *
  * @return string The fuzzy time
  */
 function fuzzy_time($time) {
@@ -2380,61 +2383,61 @@ function fuzzy_time($time) {
     // find an appropriate term
     if ($diff < 20) {
         $str = sprintf($format, 'a few seconds');
-    } else if ($diff < 55) {
+    } elseif ($diff < 55) {
         $str = sprintf($format, 'less than a minute');
-    } else if ($diff < 80) {
+    } elseif ($diff < 80) {
         $str = sprintf($format, 'about a minute');
-    } else if ($diff < 100) {
+    } elseif ($diff < 100) {
         $str = sprintf($format, 'just over a minute');
-    } else if ($diff < 160) {
+    } elseif ($diff < 160) {
         $str = sprintf($format, 'a couple of minutes');
-    } else if ($diff < 280) {
+    } elseif ($diff < 280) {
         $str = sprintf($format, 'a few minutes');
-    } else if ($diff < 500) {
+    } elseif ($diff < 500) {
         $str = sprintf($format, 'about five minutes');
-    } else if ($diff < 800) {
+    } elseif ($diff < 800) {
         $str = sprintf($format, 'about ten minutes');
-    } else if ($diff < 1200) {
+    } elseif ($diff < 1200) {
         $str = sprintf($format, 'about a quarter of an hour');
-    } else if ($diff < 2400) {
+    } elseif ($diff < 2400) {
         $str = sprintf($format, 'about half an hour');
-    } else if ($diff < 3300) {
+    } elseif ($diff < 3300) {
         $str = sprintf($format, 'about three quarters of an hour');
-    } else if ($diff < 5400) {
+    } elseif ($diff < 5400) {
         $str = sprintf($format, 'about an hour');
-    } else if ($diff < 10000) {
+    } elseif ($diff < 10000) {
         $str = sprintf($format, 'a couple of hours');
-    } else if ($diff < 30000) {
+    } elseif ($diff < 30000) {
         $str = sprintf($format, 'a few hours');
-    } else if ($diff < 60000) {
+    } elseif ($diff < 60000) {
         $str = sprintf($format, 'about half a day');
-    } else if ($diff < 155520) {
+    } elseif ($diff < 155520) {
         $str = sprintf($format, 'a day');
-    } else if ($diff < 345600) {
+    } elseif ($diff < 345600) {
         $str = sprintf($format, 'a few days');
-    } else if ($diff < 1000000) {
+    } elseif ($diff < 1000000) {
         $str = sprintf($format, 'a week');
-    } else if ($diff < 1500000) {
+    } elseif ($diff < 1500000) {
         $str = sprintf($format, 'a fortnight');
-    } else if ($diff < 2400000) {
+    } elseif ($diff < 2400000) {
         $str = sprintf($format, 'a few weeks');
-    } else if ($diff < 4320000) {
+    } elseif ($diff < 4320000) {
         $str = sprintf($format, 'a month');
-    } else if ($diff < 13000000) {
+    } elseif ($diff < 13000000) {
         $str = sprintf($format, 'a few months');
-    } else if ($diff < 23328000) {
+    } elseif ($diff < 23328000) {
         $str = sprintf($format, 'half a year');
-    } else if ($diff < 44000000) {
+    } elseif ($diff < 44000000) {
         $str = sprintf($format, 'a year');
-    } else if ($diff < 283824000) {
+    } elseif ($diff < 283824000) {
         $str = sprintf($format, 'a few years');
-    } else if ($diff < 473040000) {
+    } elseif ($diff < 473040000) {
         $str = sprintf($format, 'a decade');
-    } else if ($diff < 851472000) {
+    } elseif ($diff < 851472000) {
         $str = sprintf($format, 'a couple of decades');
-    } else if ($diff < 2838240000) {
+    } elseif ($diff < 2838240000) {
         $str = sprintf($format, 'a few decades');
-    } else if ($diff < 3468960000) {
+    } elseif ($diff < 3468960000) {
         $str = sprintf($format, 'a century');
     } else {
         $str = sprintf($format, 'over a century');
@@ -2444,7 +2447,9 @@ function fuzzy_time($time) {
 }
 
 /** Gets the main page menu
+ *
  * @param mixed $page The current page (for highlighing)
+ *
  * @return string The menu HTML
  */
 function get_menu($page=null) {
@@ -2521,9 +2526,11 @@ function get_menu($page=null) {
 }
 
 /** Converts text from markdown format to HTML
+ *
  * @param string $text The text in markdown format
  * @param bool $url True to markdown URLs
- * @param bool $multiline Add '<p></p>' tags for \n\n and <br /> for \n 
+ * @param bool $multiline Add '<p></p>' tags for \n\n and <br /> for \n
+ *
  * @return string The formatted HTML text
  */
 function markdown($text,$urls=false,$multiline=true) {
@@ -2567,9 +2574,11 @@ function markdown($text,$urls=false,$multiline=true) {
 }
 
 /** Returns a shortened version of the text (first 100 words)
+ *
  * @param string $text The text to shorten
  * @param bool $markdown True to run the text through the markdown function (and
  *                  resolve any trailing markup)
+ *
  * @return string The shortened text
  */
 function summarize($text,$markdown=true) {
@@ -2603,14 +2612,14 @@ function summarize($text,$markdown=true) {
                     if (preg_match('/^<(\s*.+?\/\s*|\s*(br)(\s.+?)?)>$/is', $line_matchings[1])) {
                         // do nothing
                     // if tag is a closing tag
-                    } else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
+                    } elseif (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
                         // delete tag from $open_tags list
                         $pos = array_search($tag_matchings[1], $open_tags);
                         if ($pos !== false) {
                         unset($open_tags[$pos]);
                         }
                     // if tag is an opening tag
-                    } else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
+                    } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
                         // add tag to the beginning of $open_tags list
                         array_unshift($open_tags, strtolower($tag_matchings[1]));
                     }
@@ -2713,6 +2722,7 @@ function summarize($text,$markdown=true) {
 // simple static helper class for settings
 class Settings {
     /** Sets a system setting, with some basic protection for some settings
+     *
      * @param string $setting The setting name
      * @param mixed $value The value to set
      * @param bool $overwrite Overwrite any existing setting with the same name
@@ -2746,8 +2756,10 @@ class Settings {
     }
     
     /** Gets a system setting
+     *
      * @param string $setting The name of the variable to get
      * @param mixed $default The default if the setting doesn't exist
+     *
      * @return mixed The value of the setting, or default.
      */
     static function get($setting,$default=null) {
@@ -2777,7 +2789,9 @@ class Settings {
     }
     
     /** Simply checks if a setting exists
+     *
      * @param string $setting The name of the setting
+     *
      * @return bool True if the setting exists, False if not.
      */
     static function exists($setting) {
@@ -2805,9 +2819,12 @@ class Settings {
     }
     
     /** Deletes a setting if it exists
+     *
      * @param string $setting The name of the setting
      */
     static function delete($setting) {
+        global $_MYSQLI;
+
         $query = "SELECT `id`
                   FROM `".DB_PREF."settings`
                   WHERE `setting`='".mysqli_real_escape_string($_MYSQLI,$setting)."'";
@@ -2816,8 +2833,10 @@ class Settings {
     }
     
     /** Searches for a setting with a specific value, and returns the number of occurances
+     *
      * @param string $setting The setting name
      * @param mixed $value The value to search for
+     *
      * @return int The number of times this setting and value occur
      */
     static function search($setting,$value) {
@@ -2855,11 +2874,13 @@ class TemplateEngine {
     }
     
     /** Parses input string to find templates, then adds templates to the template library
+     *
      * @param string $input The string containing templates
      * @param int $dupes The default action to take if a duplicate template is found
      *     default: Throw exception
      *     TEMPLATE_OVERWRITE: overwrite existing templates with new ones
      *     TEMPLATE_IGNORE: ignore duplicate templates (keep the original)
+     *
      * @throws TemplateParseException There was an error parsing the input
      * @throws TemplateDuplicateException A duplicate template was found, but no
      *              duplicate action was defined.
@@ -2869,7 +2890,7 @@ class TemplateEngine {
         $input_array = explode("\n",$input);
         
         // initial state for templates - empty
-        $template = NULL;
+        $template = null;
         $template_started = -1;
         $template_lines = array();
         
@@ -2879,7 +2900,7 @@ class TemplateEngine {
             $line_no = $line_no+1;
             
             // are we searching for a new template to start?
-            if ($template === NULL) {
+            if ($template === null) {
                 // make a blank array for matches
                 $matches = array();
                 if (preg_match('/<%%STARTTEMPLATE ([-0-9A-Za-z_\.]+)%%>/', $line, $matches)) {
@@ -2906,7 +2927,7 @@ class TemplateEngine {
                                 $this->add_template($temp, $dupes);
                                 
                                 // reset the template fields
-                                $template = NULL;
+                                $template = null;
                                 $template_started = -1;
                                 $template_lines = array();
                             } else {
@@ -2914,9 +2935,9 @@ class TemplateEngine {
                                 $template_lines[] = $line_clean;
                             }
                         }
-                    } else if ($dupes & TEMPLATE_IGNORE) {
+                    } elseif ($dupes & TEMPLATE_IGNORE) {
                         // ignore the duplicate template
-                        $template = NULL;
+                        $template = null;
                         $template_started = -1;
                         $template_lines = array();
                     } else {
@@ -2938,7 +2959,7 @@ class TemplateEngine {
                     $this->add_template($temp, $dupes);
                     
                     // reset the template fields
-                    $template = NULL;
+                    $template = null;
                     $template_lines = array();
                 } else {
                     // otherwise just add the line to the template, and move on
@@ -2948,24 +2969,26 @@ class TemplateEngine {
         }
         
         // check that the last template we were looking for has finished
-        if ($template !== NULL) {
+        if ($template !== null) {
             throw new TemplateParseException("Error parsing templates. No 'ENDTEMPLATE' found for '$template' (started on line $template_started)");
         }
     }
     
     /** Adds a template to the template library
+     *
      * @param Template $template The template to add.
      * @param int $dupes The default action to take if a duplicate template is found
      *     default: Throw exception
      *     TEMPLATE_OVERWRITE: overwrite existing templates with new ones
      *     TEMPLATE_IGNORE: ignore duplicate templates (keep the original)
+     *
      * @throws TemplateDuplicateException A duplicate template was found, but no
      *              duplicate action was defined.
      */
     function add_template(Template $template, $dupes=0) {
         if (!isset($this->templates[$template->get_name()]) || ($dupes & TEMPLATE_OVERWRITE)) {
             $this->templates[$template->get_name()] = $template;
-        } else if ($dupes & TEMPLATE_IGNORE) {
+        } elseif ($dupes & TEMPLATE_IGNORE) {
             // ignore the duplicate template
         } else {
             throw new TemplateDuplicateException("Cannot add template '$template' as it already exists in library, and no duplicate action is defined");
@@ -2973,11 +2996,13 @@ class TemplateEngine {
     }
     
     /** Merges templates from another engine into this one.
+     *
      * @param TemplateEngine $other The other template engine.
      * @param int $dupes The default action to take if a duplicate template is found
      *     default: Throw exception
      *     TEMPLATE_OVERWRITE: overwrite existing templates with new ones
      *     TEMPLATE_IGNORE: ignore duplicate templates (keep the original)
+     *
      * @throws TemplateDuplicateException A duplicate template was found, but no
      *              duplicate action was defined.
      */
@@ -2989,7 +3014,7 @@ class TemplateEngine {
             // if we don't have the template, or are set to overwrite templates, add it.
             if (!isset($this->templates[$template]) || ($dupes & TEMPLATE_OVERWRITE)) {
                 $this->add_template($other->get_template($template), $dupes);
-            } else if ($dupes & TEMPLATE_IGNORE) {
+            } elseif ($dupes & TEMPLATE_IGNORE) {
                 // ignore the duplicate template
             } else {
                 throw new TemplateDuplicateException("Cannot merge template '$template' as it already exists in library, and no duplicate action is defined");
@@ -3000,8 +3025,10 @@ class TemplateEngine {
     /** Renders a template from the template library. It will automatically fill
      *   slots in the template with corresponding data from the slots array, and
      *   will call in and render templates required from the template library.
+     *
      * @param string $template_name The name of the template to render
      * @param array $slots An array of data to place in named slots
+     *
      * @return string The rendered template
      * @throws TemplateMissingException A required template could not be found in
      *              the template library.
@@ -3025,6 +3052,7 @@ class TemplateEngine {
     }
     
     /** Returns a list of all template names in the template library
+     *
      * @return array The names of all templates in the library
      */
     function list_templates() {
@@ -3032,7 +3060,9 @@ class TemplateEngine {
     }
     
     /** Gets a named template from the template library
+     *
      * @param string $template_name The name of the requested template
+     *
      * @return Template The requested template
      * @throws TemplateMissingException If the template does not exist in the
      *              template library.
@@ -3089,6 +3119,7 @@ class Template {
     }
     
     /** Returns the template name
+     *
      * @return string The name of the template.
      */
     function get_name() {
@@ -3096,8 +3127,10 @@ class Template {
     }
     
     /** Renders the template
+     *
      * @param array $slots Optional data to fill slots in the template
      * @param TemplateEngine &$template_source A source for other required templates
+     *
      * @return string The template text
      * @throws TemplateMissingException A required template could not be found in
      *              the template source.
