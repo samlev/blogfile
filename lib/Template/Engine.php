@@ -53,7 +53,7 @@ class Engine {
     /**
      * Merges templates from another engine into this one.
      *
-     * @param TemplateEngine $other The other template engine.
+     * @param Engine $other The other template engine.
      * @param integer $dupes The default action to take if a duplicate template is found
      *     default: Throw exception
      *     TEMPLATE_OVERWRITE: overwrite existing templates with new ones
@@ -62,7 +62,7 @@ class Engine {
      * @throws TemplateDuplicateException A duplicate template was found, but no duplicate action was defined.*
      * @throws TemplateMissingException If a template cannot be found
      */
-    public function merge_templates(TemplateEngine $other, int $dupes=0) {
+    public function merge_templates(Engine $other, int $dupes=0) {
         $other_templates = $other->list_templates();
 
         // Go through the list of templates from the other template engine
