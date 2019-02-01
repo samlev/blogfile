@@ -1,0 +1,13 @@
+<tr>
+  <td><a href="<%%OPENSLOT URL_BASE%%>?p=edit<%%OPENSLOT POST_TYPE%%>&amp;id=<%%OPENSLOT POST_ID%%>"><%%OPENSLOT POST_TITLE%%></a></td>
+  <td><%%OPENSLOT POST_PUBLISHED%%></td>
+  <td>
+    <form method="POST">
+      <input type="hidden" name="p" value="delete<%%OPENSLOT POST_TYPE%%>" />
+      <input type="hidden" name="id" value="<%%OPENSLOT POST_ID%%>" />
+      <input type="checkbox" name="confirm" />
+      Confirm
+      <input type="submit" value="Delete" />
+    </form>
+  </td>
+</tr>

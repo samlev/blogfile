@@ -1,0 +1,47 @@
+<form method="POST" id="installform" class="contentwrapper">
+  <p>First thing's first - you need to set some database settings</p>
+  <div class="error <%%OPENSLOT DB_ERROR_CLASS%%>"><%%OPENSLOT DB_ERROR%%></div>
+  <div class="formfield">
+    Hostname<br />
+    <input type="text" name="DB_HOST" value="<%%OPENSLOT DB_HOST%%>" />
+  </div>
+  <div class="formfield">
+    Username<br />
+    <input type="text" name="DB_USER" value="<%%OPENSLOT DB_USER%%>" />
+  </div>
+  <div class="formfield">
+    Password<br />
+    <input type="text" name="DB_PASS" value="<%%OPENSLOT DB_PASS%%>" />
+  </div>
+  <div class="formfield">
+    Database<br />
+    <input type="text" name="DB_BASE" value="<%%OPENSLOT DB_BASE%%>" />
+  </div>
+  <div class="formfield">
+    Table Pre-fix<br />
+    <input type="text" name="DB_PREF" value="<%%OPENSLOT DB_PREF%%>" />
+    <div class="explain">To install multiple blogs on one database, change this</div>
+  </div>
+  <p>Well that was easy! Now some site settings. These can be changed later.</p>
+  <div class="formfield">
+    Password<br />
+    <input type="text" name="password" value="<%%OPENSLOT password%%>" />
+    <div class="explain">This is a single-user blog, so a password is all you need. Either write this password down, or change it to something you remember.</div>
+  </div>
+  <div class="formfield">
+    Your Name<br />
+    <input type="text" name="name" value="<%%OPENSLOT name%%>" />
+    <div class="explain">This will be shown on your comments.</div>
+  </div>
+  <div class="formfield">
+    Site title<br />
+    <input type="text" name="sitetitle" value="<%%OPENSLOT sitetitle%%>" />
+    <div class="explain">The large text at the top left.</div>
+  </div>
+  <div class="formfield">
+    Site extra<br />
+    <input type="text" name="siteextra" value="<%%OPENSLOT siteextra%%>" />
+    <div class="explain">The smaller text under the site title</div>
+  </div>
+  <input type="submit" name="DO_INSTALL" value="Install" />
+</form>

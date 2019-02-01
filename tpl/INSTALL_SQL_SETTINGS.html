@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>settings` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`setting` varchar(50) NOT NULL,
+`value` text NOT NULL,
+`time_set` datetime NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

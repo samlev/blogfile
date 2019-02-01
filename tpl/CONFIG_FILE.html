@@ -1,0 +1,18 @@
+// Database settings
+define('DB_HOST','<%%OPENSLOT DB_HOST%%>');
+define('DB_USER','<%%OPENSLOT DB_USER%%>');
+define('DB_PASS','<%%OPENSLOT DB_PASS%%>');
+define('DB_BASE','<%%OPENSLOT DB_BASE%%>');
+define('DB_PREF','<%%OPENSLOT DB_PREF%%>');
+
+// Connect to the database
+$_MYSQLI = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_BASE);
+if ($_MYSQLI->connect_errno) {
+die("Could not connect to database [".$_MYSQLI->connect_errno."] :: ".$_MYSQLI->connect_error);
+}
+
+// Random hash used to salt all other hashes. Keep it secret!
+define('SITE_SALT','<%%OPENSLOT SITE_SALT%%>');
+
+// and with this, the site will officially be isntalled!
+define('SITE_INSTALLED',true);

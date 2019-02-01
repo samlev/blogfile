@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS `<%%OPENSLOT DB_PREFIX%%>comments` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`post_id` int(11) NOT NULL,
+`author_name` varchar(32) NOT NULL,
+`author_web` varchar(1024) NOT NULL,
+`comment` text NOT NULL,
+`time_posted` datetime NOT NULL,
+`visible` int(11) NOT NULL,
+`author_hash` varchar(32) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

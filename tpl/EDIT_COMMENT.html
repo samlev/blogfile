@@ -1,0 +1,22 @@
+<form method="POST" class="contentwrapper">
+  <input type="hidden" name="p" value="savecomment" />
+  <input type="hidden" name="commentid" value="<%%OPENSLOT COMMENT_ID%%>" />
+  <div class="error <%%OPENSLOT COMMENT_ERROR%%>"><%%OPENSLOT ERROR_MESSAGE%%></div>
+  <div class="formfield">
+    Name<br />
+    <input type="text" name="name" value="<%%OPENSLOT COMMENTER_NAME%%>" />
+  </div>
+  <div class="formfield">
+    Web<br />
+    <input type="url" name="web" value="<%%OPENSLOT COMMENTER_URL%%>" />
+  </div>
+  <div class="formfield">
+    Comment<br />
+    <textarea name="comment"><%%OPENSLOT COMMENT%%></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN%%>
+  </div>
+  <div class="formfield">
+    Comment status: <%%OPENSLOT STATUS%%>
+  </div>
+  <input type="submit" value="Save Comment" />
+</form>

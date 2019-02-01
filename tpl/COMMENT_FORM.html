@@ -1,0 +1,20 @@
+<form method="POST">
+  <a name="commentform"></a>
+  <input type="hidden" name="p" value="comment" />
+  <input type="hidden" name="blogid" value="<%%OPENSLOT BLOG_ID%%>" />
+  <%%USETEMPLATE ANTI_SPAM%%>
+  <div class="formfield">
+    Name<br />
+    <input type="text" name="cname" value="<%%OPENSLOT COMMENTER_NAME%%>" />
+  </div>
+  <div class="formfield">
+    Web<br />
+    <input type="url" name="cweb" value="<%%OPENSLOT COMMENTER_URL%%>" />
+  </div>
+  <div class="formfield">
+    Comment<br />
+    <textarea name="cbody" id="commentfield"></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN%%>
+  </div>
+  <input type="submit" value="Post Comment" />
+</form>

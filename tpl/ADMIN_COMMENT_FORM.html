@@ -1,0 +1,11 @@
+<form method="POST">
+  <a name="commentform"></a>
+  <input type="hidden" name="p" value="comment" />
+  <input type="hidden" name="blogid" value="<%%OPENSLOT BLOG_ID%%>" />
+  <div class="formfield">
+    Comment<br />
+    <textarea name="cbody" id="commentfield"></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN%%>
+  </div>
+  <input type="submit" value="Post Comment" />
+</form>

@@ -1,0 +1,36 @@
+<form method="POST" class="contentwrapper">
+  <input type="hidden" name="p" value="savesettings" />
+  <div class="mention<%%OPENSLOT SETTINGS_SAVED%%>">
+    Settings saved.
+  </div>
+  <div class="formfield">
+    Password<br />
+    <input type="text" name="password" />
+    <div class="explain">Only set this if you want to change settings</div>
+  </div>
+  <div class="formfield">
+    Your Name<br />
+    <input type="text" name="displayname" value="<%%OPENSLOT SETTING_displayname%%>" />
+    <div class="explain">This will be shown on your comments and posts. Cannot be blank.</div>
+  </div>
+  <div class="formfield">
+    Site title<br />
+    <input type="text" name="sitetitle" value="<%%OPENSLOT SETTING_sitetitle%%>" />
+    <div class="explain">The large text at the top left. Cannot be blank.</div>
+  </div>
+  <div class="formfield">
+    Site extra<br />
+    <input type="text" name="siteextra" value="<%%OPENSLOT SETTING_siteextra%%>" />
+    <div class="explain">The smaller text under the site title</div>
+  </div>
+  <div class="formfield">
+    Number of posts on the home page<br />
+    <input type="number" name="homepage_posts" min="1" step="1" value="<%%OPENSLOT SETTING_homepage_posts%%>" />
+    <div class="explain">Minimum 1 - anything lower will return to the default</div>
+  </div>
+  <div class="formfield">
+    <input type="checkbox" name="allowcommenturls" class="shortfield"<%%OPENSLOT SETTING_allowcommenturls%%> />
+    Allow URLs in comments
+  </div>
+  <input type="submit" value="Save Settings" />
+</form>

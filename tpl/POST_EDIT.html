@@ -1,0 +1,21 @@
+<form method="POST" class="contentwrapper">
+  <input type="hidden" name="p" value="savepost" />
+  <input type="hidden" name="id" value="<%%OPENSLOT POST_ID%%>" />
+  <input type="hidden" name="type" value="<%%OPENSLOT POST_TYPE%%>" />
+  <div class="error <%%OPENSLOT POST_ERROR%%>"><%%OPENSLOT ERROR_MESSAGE%%></div>
+  <div class="formfield">
+    <%%OPENSLOT POST_TYPE%%> title<br />
+    <input type="text" name="title" value="<%%OPENSLOT POST_TITLE%%>" />
+  </div>
+  <div class="formfield">
+    <%%OPENSLOT POST_TYPE%%> content<br />
+    <textarea name="content" class="bigfield"><%%OPENSLOT POST_CONTENT%%></textarea>
+    <%%USETEMPLATE MARKDOWN_EXPLAIN_FULL%%>
+  </div>
+  <div class="formfield">
+    <input type="checkbox" name="published" class="shortfield"<%%OPENSLOT POST_PUBLISHED%%> />
+    Published
+  </div>
+  <%%OPENSLOT POST_COMMENTS%%>
+  <input type="submit" value="Save" />
+</form>
